@@ -1,0 +1,117 @@
+:root {
+  /* Background layers */
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #101018;
+  --bg-tertiary: #16162a;
+  --bg-hover: #1e1e3a;
+  --bg-active: #252548;
+
+  /* Neon accents */
+  --accent-green: #00ff41;
+  --accent-cyan: #0abdc6;
+  --accent-red: #ff0040;
+  --accent-amber: #ffb700;
+  --accent-purple: #b347d9;
+  --accent-blue: #2196f3;
+
+  /* Text */
+  --text-primary: #e0e0e8;
+  --text-secondary: #8888aa;
+  --text-muted: #555570;
+  --text-accent: #00ff41;
+
+  /* Borders */
+  --border-color: #1e1e38;
+  --border-light: #2a2a48;
+
+  /* Glows */
+  --glow-green: 0 0 8px rgba(0, 255, 65, 0.3);
+  --glow-cyan: 0 0 8px rgba(10, 189, 198, 0.3);
+  --glow-red: 0 0 8px rgba(255, 0, 64, 0.3);
+
+  /* Font */
+  --font-mono: 'JetBrains Mono', 'Cascadia Code', 'Fira Code', monospace;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 16px;
+  --font-size-xl: 20px;
+
+  /* Spacing */
+  --sidebar-width: 280px;
+  --titlebar-height: 38px;
+  --statusbar-height: 28px;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #2a2a48;
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-green);
+}
+
+/* Selection */
+::selection {
+  background: rgba(0, 255, 65, 0.2);
+  color: var(--accent-green);
+}
+
+/* Links */
+a {
+  color: var(--accent-cyan);
+  text-decoration: none;
+}
+
+a:hover {
+  text-shadow: var(--glow-cyan);
+}
+
+/* Utility classes */
+.glow-green { text-shadow: var(--glow-green); }
+.glow-cyan { text-shadow: var(--glow-cyan); }
+
+.text-green { color: var(--accent-green); }
+.text-cyan { color: var(--accent-cyan); }
+.text-red { color: var(--accent-red); }
+.text-amber { color: var(--accent-amber); }
+.text-purple { color: var(--accent-purple); }
+.text-muted { color: var(--text-muted); }
