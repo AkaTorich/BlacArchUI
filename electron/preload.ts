@@ -62,6 +62,55 @@ contextBridge.exposeInMainWorld('electronAPI', {
   closeChildWindow: (terminalId?: string) =>
     ipcRenderer.send('window:closeChild', terminalId),
 
+  // Remote Desktop (VNC/RDP)
+  openRemoteWindow: (opts: {
+    sessionId: string;
+    type: 'vnc' | 'rdp';
+    host: string;
+    port: number;
+    title: string;
+    username?: string;
+    password?: string;
+    domain?: string;
+  }) => ipcRenderer.invoke('remote:openWindow', opts),
+
+  vncConnect: (sessionId: string, host: string, port: number, password?: string) =>
+    ipcRenderer.invoke('remote:vncConnect', sessionId, host, port, password),
+  vncDisconnect: (sessionId: string) =>
+    ipcRenderer.invoke('remote:vncDisconnect', sessionId),
+
+  rdpConnect: (sessionId: string, host: string, port: number, username: string, password: string, domain?: string) =>
+    ipcRenderer.invoke('remote:rdpConnect', sessionId, host, port, username, password, domain),
+  rdpDisconnect: (sessionId: string) =>
+    ipcRenderer.invoke('remote:rdpDisconnect', sessionId),
+  rdpSendMouse: (sessionId: string, x: number, y: number, button: number, isPressed: boolean) =>
+    ipcRenderer.send('remote:rdpMouse', sessionId, x, y, button, isPressed),
+  rdpSendKey: (sessionId: string, scancode: number, isPressed: boolean, isExtended: boolean) =>
+    ipcRenderer.send('remote:rdpKey', sessionId, scancode, isPressed, isExtended),
+  rdpSendWheel: (sessionId: string, x: number, y: number, step: number, isNegative: boolean, isHorizontal: boolean) =>
+    ipcRenderer.send('remote:rdpWheel', sessionId, x, y, step, isNegative, isHorizontal),
+
+  onRdpConnected: (callback: (sessionId: string) => void) => {
+    const handler = (_event: any, sessionId: string) => callback(sessionId);
+    ipcRenderer.on('rdp:connected', handler);
+    return () => ipcRenderer.removeListener('rdp:connected', handler);
+  },
+  onRdpBitmap: (callback: (sessionId: string, bitmap: any) => void) => {
+    const handler = (_event: any, sessionId: string, bitmap: any) => callback(sessionId, bitmap);
+    ipcRenderer.on('rdp:bitmap', handler);
+    return () => ipcRenderer.removeListener('rdp:bitmap', handler);
+  },
+  onRdpClosed: (callback: (sessionId: string) => void) => {
+    const handler = (_event: any, sessionId: string) => callback(sessionId);
+    ipcRenderer.on('rdp:closed', handler);
+    return () => ipcRenderer.removeListener('rdp:closed', handler);
+  },
+  onRdpError: (callback: (sessionId: string, error: string) => void) => {
+    const handler = (_event: any, sessionId: string, error: string) => callback(sessionId, error);
+    ipcRenderer.on('rdp:error', handler);
+    return () => ipcRenderer.removeListener('rdp:error', handler);
+  },
+
   // Window controls
   windowMinimize: () => ipcRenderer.send('window:minimize'),
   windowMaximize: () => ipcRenderer.send('window:maximize'),

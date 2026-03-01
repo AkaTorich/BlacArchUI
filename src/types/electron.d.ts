@@ -35,6 +35,41 @@ export interface ElectronAPI {
 
   closeChildWindow: (terminalId?: string) => void;
 
+  // Remote Desktop (VNC/RDP)
+  openRemoteWindow: (opts: {
+    sessionId: string;
+    type: 'vnc' | 'rdp';
+    host: string;
+    port: number;
+    title: string;
+    username?: string;
+    password?: string;
+    domain?: string;
+  }) => Promise<void>;
+
+  vncConnect: (sessionId: string, host: string, port: number, password?: string) => Promise<{ wsPort: number }>;
+  vncDisconnect: (sessionId: string) => Promise<void>;
+
+  rdpConnect: (sessionId: string, host: string, port: number, username: string, password: string, domain?: string) => Promise<void>;
+  rdpDisconnect: (sessionId: string) => Promise<void>;
+  rdpSendMouse: (sessionId: string, x: number, y: number, button: number, isPressed: boolean) => void;
+  rdpSendKey: (sessionId: string, scancode: number, isPressed: boolean, isExtended: boolean) => void;
+  rdpSendWheel: (sessionId: string, x: number, y: number, step: number, isNegative: boolean, isHorizontal: boolean) => void;
+
+  onRdpConnected: (callback: (sessionId: string) => void) => () => void;
+  onRdpBitmap: (callback: (sessionId: string, bitmap: {
+    destTop: number;
+    destLeft: number;
+    destRight: number;
+    destBottom: number;
+    width: number;
+    height: number;
+    bitsPerPixel: number;
+    data: number[];
+  }) => void) => () => void;
+  onRdpClosed: (callback: (sessionId: string) => void) => () => void;
+  onRdpError: (callback: (sessionId: string, error: string) => void) => () => void;
+
   windowMinimize: () => void;
   windowMaximize: () => void;
   windowClose: () => void;

@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Wifi, WifiOff, Plus, Trash2, Server, Terminal, ExternalLink } from 'lucide-react';
+import { Wifi, WifiOff, Plus, Trash2, Server, Terminal, ExternalLink, Monitor } from 'lucide-react';
 import { ISSHConnectionConfig } from '../../types/ssh';
 import { SSHConnectionDialog } from './SSHConnectionDialog';
+import { RemoteConnectionDialog } from '../remote/RemoteConnectionDialog';
 
 export function SSHConnectionList() {
   const [connections, setConnections] = useState<ISSHConnectionConfig[]>([]);
   const [connectedIds, setConnectedIds] = useState<Set<string>>(new Set());
   const [showDialog, setShowDialog] = useState(false);
   const [reconnectConfig, setReconnectConfig] = useState<ISSHConnectionConfig | null>(null);
+  const [remoteDialog, setRemoteDialog] = useState<{ type: 'vnc' | 'rdp'; host: string } | null>(null);
 
   const loadConnections = async () => {
     const saved = await window.electronAPI.sshGetSaved();
@@ -69,6 +71,27 @@ export function SSHConnectionList() {
       title: `SSH: ${conn.label}`,
       sshConnectionId: conn.id,
     });
+  };
+
+  const openRemoteDesktop = (conn: ISSHConnectionConfig, type: 'vnc' | 'rdp') => {
+    setRemoteDialog({ type, host: conn.host });
+  };
+
+  const handleRemoteConnect = (config: { host: string; port: number; username: string; password: string; domain: string }) => {
+    if (!remoteDialog) return;
+    const sessionId = `${remoteDialog.type}-${Date.now()}`;
+    const title = `${remoteDialog.type.toUpperCase()}: ${config.host}`;
+    window.electronAPI.openRemoteWindow({
+      sessionId,
+      type: remoteDialog.type,
+      host: config.host,
+      port: config.port,
+      title,
+      username: config.username || undefined,
+      password: config.password || undefined,
+      domain: config.domain || undefined,
+    });
+    setRemoteDialog(null);
   };
 
   const handleDisconnect = async (id: string) => {
@@ -168,6 +191,20 @@ export function SSHConnectionList() {
                   )}
                   <button
                     style={styles.actionBtn}
+                    onClick={() => openRemoteDesktop(conn, 'rdp')}
+                    title="RDP подключение"
+                  >
+                    <Monitor size={12} color="var(--accent-blue)" />
+                  </button>
+                  <button
+                    style={styles.actionBtn}
+                    onClick={() => openRemoteDesktop(conn, 'vnc')}
+                    title="VNC подключение"
+                  >
+                    <Monitor size={12} color="var(--accent-purple)" />
+                  </button>
+                  <button
+                    style={styles.actionBtn}
                     onClick={() => handleDelete(conn.id)}
                     title="Удалить"
                   >
@@ -185,6 +222,15 @@ export function SSHConnectionList() {
           onClose={() => { setShowDialog(false); setReconnectConfig(null); }}
           onConnect={handleDialogConnect}
           initialConfig={reconnectConfig || undefined}
+        />
+      )}
+
+      {remoteDialog && (
+        <RemoteConnectionDialog
+          type={remoteDialog.type}
+          host={remoteDialog.host}
+          onClose={() => setRemoteDialog(null)}
+          onConnect={handleRemoteConnect}
         />
       )}
     </div>

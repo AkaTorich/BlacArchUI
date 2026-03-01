@@ -7,6 +7,7 @@ import { StatusBar } from './components/layout/StatusBar';
 import { TerminalTabs } from './components/terminal/TerminalTabs';
 import { TerminalWindow } from './components/terminal/TerminalWindow';
 import { SSHListWindow } from './components/ssh/SSHListWindow';
+import { RemoteDesktopWindow } from './components/remote/RemoteDesktopWindow';
 
 function AppContent() {
   const { dispatch } = useAppContext();
@@ -65,6 +66,21 @@ export function App() {
 
   if (params.get('sshListWindow')) {
     return <SSHListWindow />;
+  }
+
+  if (params.get('remoteDesktop')) {
+    return (
+      <RemoteDesktopWindow
+        sessionId={params.get('sessionId') || `remote-${Date.now()}`}
+        type={(params.get('type') as 'vnc' | 'rdp') || 'vnc'}
+        host={params.get('host') || ''}
+        port={Number(params.get('port')) || 5900}
+        title={params.get('title') || 'Remote Desktop'}
+        username={params.get('username') || undefined}
+        password={params.get('password') || undefined}
+        domain={params.get('domain') || undefined}
+      />
+    );
   }
 
   return (

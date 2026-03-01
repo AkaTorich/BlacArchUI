@@ -13,6 +13,8 @@ export default defineConfig({
         'electron',
         'node-pty',
         '@lydell/node-pty',
+        'bufferutil',
+        'utf-8-validate',
       ],
     },
   },

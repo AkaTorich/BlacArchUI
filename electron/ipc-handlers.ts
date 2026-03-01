@@ -3,12 +3,16 @@ import { ToolDatabase } from './services/tool-database';
 import { PtyManager } from './services/pty-manager';
 import { SSHManager, SSHConnectionConfig } from './services/ssh-manager';
 import { ConnectionStore } from './services/connection-store';
+import { VNCProxy } from './services/vnc-proxy';
+import { RDPManager } from './services/rdp-manager';
 
 export function registerIpcHandlers(
   toolDb: ToolDatabase,
   ptyManager: PtyManager,
   sshManager: SSHManager,
-  connectionStore: ConnectionStore
+  connectionStore: ConnectionStore,
+  vncProxy: VNCProxy,
+  rdpManager: RDPManager
 ): void {
   // Tools
   ipcMain.handle('tools:getAll', () => toolDb.getAll());
@@ -61,4 +65,30 @@ export function registerIpcHandlers(
   ipcMain.handle('ssh:isConnected', (_event, id: string) =>
     sshManager.isConnected(id)
   );
+
+  // VNC
+  ipcMain.handle('remote:vncConnect', async (_event, sessionId: string, host: string, port: number, _password?: string) => {
+    const wsPort = await vncProxy.startProxy(sessionId, host, port);
+    return { wsPort };
+  });
+  ipcMain.handle('remote:vncDisconnect', (_event, sessionId: string) => {
+    vncProxy.stopProxy(sessionId);
+  });
+
+  // RDP
+  ipcMain.handle('remote:rdpConnect', (event, sessionId: string, host: string, port: number, username: string, password: string, domain?: string) => {
+    rdpManager.connect(sessionId, host, port, username, password, domain || '', event.sender);
+  });
+  ipcMain.handle('remote:rdpDisconnect', (_event, sessionId: string) => {
+    rdpManager.disconnect(sessionId);
+  });
+  ipcMain.on('remote:rdpMouse', (_event, sessionId: string, x: number, y: number, button: number, isPressed: boolean) => {
+    rdpManager.sendMouse(sessionId, x, y, button, isPressed);
+  });
+  ipcMain.on('remote:rdpKey', (_event, sessionId: string, scancode: number, isPressed: boolean, isExtended: boolean) => {
+    rdpManager.sendKeyboard(sessionId, scancode, isPressed, isExtended);
+  });
+  ipcMain.on('remote:rdpWheel', (_event, sessionId: string, x: number, y: number, step: number, isNegative: boolean, isHorizontal: boolean) => {
+    rdpManager.sendWheel(sessionId, x, y, step, isNegative, isHorizontal);
+  });
 }

@@ -4,6 +4,8 @@ import { ToolDatabase } from './services/tool-database';
 import { PtyManager } from './services/pty-manager';
 import { SSHManager } from './services/ssh-manager';
 import { ConnectionStore } from './services/connection-store';
+import { VNCProxy } from './services/vnc-proxy';
+import { RDPManager } from './services/rdp-manager';
 import { registerIpcHandlers } from './ipc-handlers';
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling
@@ -16,6 +18,8 @@ const toolDb = new ToolDatabase();
 const ptyManager = new PtyManager();
 const sshManager = new SSHManager();
 const connectionStore = new ConnectionStore();
+const vncProxy = new VNCProxy();
+const rdpManager = new RDPManager();
 
 declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string | undefined;
 declare const MAIN_WINDOW_VITE_NAME: string;
@@ -56,10 +60,16 @@ const createWindow = () => {
       if (!win.isDestroyed()) win.destroy();
     }
     terminalWindows.clear();
+    for (const win of remoteWindows.values()) {
+      if (!win.isDestroyed()) win.destroy();
+    }
+    remoteWindows.clear();
     if (sshListWindow && !sshListWindow.isDestroyed()) {
       sshListWindow.destroy();
       sshListWindow = null;
     }
+    vncProxy.stopAll();
+    rdpManager.disconnectAll();
     app.quit();
   });
 };
@@ -158,12 +168,74 @@ function createSSHListWindow() {
   });
 }
 
+const remoteWindows = new Map<string, BrowserWindow>();
+
+function createRemoteDesktopWindow(opts: {
+  sessionId: string;
+  type: 'vnc' | 'rdp';
+  host: string;
+  port: number;
+  title: string;
+  username?: string;
+  password?: string;
+  domain?: string;
+}) {
+  const win = new BrowserWindow({
+    width: 1024,
+    height: 768,
+    minWidth: 640,
+    minHeight: 480,
+    frame: false,
+    backgroundColor: '#0a0a0f',
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  remoteWindows.set(opts.sessionId, win);
+
+  const params = new URLSearchParams();
+  params.set('remoteDesktop', '1');
+  params.set('type', opts.type);
+  params.set('sessionId', opts.sessionId);
+  params.set('host', opts.host);
+  params.set('port', String(opts.port));
+  params.set('title', opts.title);
+  if (opts.username) params.set('username', opts.username);
+  if (opts.password) params.set('password', opts.password);
+  if (opts.domain) params.set('domain', opts.domain);
+
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}?${params.toString()}`);
+  } else {
+    win.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
+      { search: params.toString() }
+    );
+  }
+
+  win.on('closed', () => {
+    console.log(`[Window] remote desktop window CLOSED: ${opts.sessionId}`);
+    remoteWindows.delete(opts.sessionId);
+    if (isQuitting) return;
+    try {
+      if (opts.type === 'vnc') {
+        vncProxy.stopProxy(opts.sessionId);
+      } else {
+        rdpManager.disconnect(opts.sessionId);
+      }
+    } catch (_) { /* ignore */ }
+  });
+}
+
 app.whenReady().then(async () => {
   await toolDb.load();
   createWindow();
   ptyManager.setMainWindow(mainWindow!);
   sshManager.setMainWindow(mainWindow!);
-  registerIpcHandlers(toolDb, ptyManager, sshManager, connectionStore);
+  registerIpcHandlers(toolDb, ptyManager, sshManager, connectionStore, vncProxy, rdpManager);
 
   // Terminal window handler
   ipcMain.handle('terminal:openWindow', (_event, opts: {
@@ -178,6 +250,20 @@ app.whenReady().then(async () => {
   // SSH list window handler
   ipcMain.handle('ssh:openListWindow', () => {
     createSSHListWindow();
+  });
+
+  // Remote desktop window handler
+  ipcMain.handle('remote:openWindow', (_event, opts: {
+    sessionId: string;
+    type: 'vnc' | 'rdp';
+    host: string;
+    port: number;
+    title: string;
+    username?: string;
+    password?: string;
+    domain?: string;
+  }) => {
+    createRemoteDesktopWindow(opts);
   });
 
   // Window control handlers — use event.sender to support multiple windows
@@ -200,7 +286,6 @@ app.whenReady().then(async () => {
     // Cleanup pty/ssh before destroying
     if (terminalId) {
       try {
-        // Find what kind of terminal this is
         const opts = [...terminalWindows.entries()].find(([, w]) => w === win);
         if (opts) {
           terminalWindows.delete(opts[0]);
@@ -209,6 +294,17 @@ app.whenReady().then(async () => {
         sshManager.unregisterSender(terminalId);
       } catch (_) { /* ignore */ }
     }
+
+    // Cleanup remote desktop sessions
+    try {
+      const remoteEntry = [...remoteWindows.entries()].find(([, w]) => w === win);
+      if (remoteEntry) {
+        const [sessionId] = remoteEntry;
+        remoteWindows.delete(sessionId);
+        vncProxy.stopProxy(sessionId);
+        rdpManager.disconnect(sessionId);
+      }
+    } catch (_) { /* ignore */ }
 
     // Destroy immediately — no renderer cleanup, no crash
     win.destroy();
