@@ -121,7 +121,7 @@ export function TerminalTabs() {
             >
               <span style={styles.tabTitle}>{tab.title}</span>
               <button
-                style={styles.tabClose}
+                style={styles.popoutBtn}
                 onClick={(e) => popoutTab(tab.id, e)}
                 title="Открыть в отдельном окне"
               >
@@ -231,6 +231,17 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: 100,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+  },
+  popoutBtn: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    background: 'transparent',
+    border: 'none',
+    color: 'var(--accent-amber)',
+    cursor: 'pointer',
+    padding: 2,
+    borderRadius: 2,
   },
   tabClose: {
     display: 'flex',

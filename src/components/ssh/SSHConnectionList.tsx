@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Wifi, WifiOff, Plus, Trash2, Server } from 'lucide-react';
+import { Wifi, WifiOff, Plus, Trash2, Server, Terminal, ExternalLink } from 'lucide-react';
 import { ISSHConnectionConfig } from '../../types/ssh';
 import { SSHConnectionDialog } from './SSHConnectionDialog';
 
@@ -7,6 +7,7 @@ export function SSHConnectionList() {
   const [connections, setConnections] = useState<ISSHConnectionConfig[]>([]);
   const [connectedIds, setConnectedIds] = useState<Set<string>>(new Set());
   const [showDialog, setShowDialog] = useState(false);
+  const [reconnectConfig, setReconnectConfig] = useState<ISSHConnectionConfig | null>(null);
 
   const loadConnections = async () => {
     const saved = await window.electronAPI.sshGetSaved();
@@ -34,19 +35,40 @@ export function SSHConnectionList() {
     return cleanup;
   }, []);
 
-  const handleConnect = (config: ISSHConnectionConfig) => {
+  const handleDialogConnect = (config: ISSHConnectionConfig) => {
     setShowDialog(false);
+    setReconnectConfig(null);
     setConnectedIds((prev) => new Set(prev).add(config.id));
     loadConnections();
+    openSSHTerminal(config.id, config.label);
+  };
 
-    // Open SSH terminal tab
+  const handleReconnect = (conn: ISSHConnectionConfig) => {
+    if (connectedIds.has(conn.id)) {
+      openSSHTerminal(conn.id, conn.label);
+      return;
+    }
+    // Open dialog pre-filled with saved config so user can enter password
+    setReconnectConfig(conn);
+  };
+
+  const openSSHTerminal = (connectionId: string, label: string) => {
     const addTab = (window as any).__addTerminalTab;
     if (addTab) {
       addTab({
-        sshConnectionId: config.id,
-        title: `SSH: ${config.label}`,
+        sshConnectionId: connectionId,
+        title: `SSH: ${label}`,
       });
     }
+  };
+
+  const openSSHInWindow = (conn: ISSHConnectionConfig) => {
+    const terminalId = `term-ssh-${Date.now()}`;
+    window.electronAPI.openTerminalWindow({
+      terminalId,
+      title: `SSH: ${conn.label}`,
+      sshConnectionId: conn.id,
+    });
   };
 
   const handleDisconnect = async (id: string) => {
@@ -70,9 +92,14 @@ export function SSHConnectionList() {
     <div style={styles.container}>
       <div style={styles.header}>
         <span style={styles.headerText}>SSH</span>
-        <button style={styles.addBtn} onClick={() => setShowDialog(true)} title="Новое подключение">
-          <Plus size={13} />
-        </button>
+        <div style={styles.headerActions}>
+          <button style={styles.addBtn} onClick={() => window.electronAPI.openSSHListWindow()} title="Открыть в отдельном окне">
+            <ExternalLink size={12} />
+          </button>
+          <button style={styles.addBtn} onClick={() => setShowDialog(true)} title="Новое подключение">
+            <Plus size={13} />
+          </button>
+        </div>
       </div>
 
       <div style={styles.list}>
@@ -84,26 +111,61 @@ export function SSHConnectionList() {
         ) : (
           connections.map((conn) => {
             const isConnected = connectedIds.has(conn.id);
+            const isConnecting = false;
             return (
               <div key={conn.id} style={styles.item}>
-                <div style={styles.itemInfo}>
+                <div
+                  style={styles.itemInfo}
+                  onClick={() => handleReconnect(conn)}
+                  title={isConnected ? 'Открыть терминал' : 'Подключиться'}
+                >
                   <span style={{
                     ...styles.dot,
-                    background: isConnected ? 'var(--accent-green)' : 'var(--text-muted)',
+                    background: isConnecting ? 'var(--accent-amber)' : isConnected ? 'var(--accent-green)' : 'var(--text-muted)',
                     boxShadow: isConnected ? 'var(--glow-green)' : 'none',
                   }} />
-                  <span style={styles.itemLabel}>{conn.label}</span>
+                  <span style={{
+                    ...styles.itemLabel,
+                    color: isConnected ? 'var(--text-primary)' : 'var(--text-secondary)',
+                  }}>
+                    {isConnecting ? `${conn.label}...` : conn.label}
+                  </span>
                 </div>
                 <div style={styles.itemActions}>
-                  {isConnected ? (
+                  {isConnected && (
+                    <>
+                      <button
+                        style={styles.actionBtn}
+                        onClick={() => openSSHTerminal(conn.id, conn.label)}
+                        title="Открыть терминал"
+                      >
+                        <Terminal size={12} color="var(--accent-green)" />
+                      </button>
+                      <button
+                        style={styles.actionBtn}
+                        onClick={() => openSSHInWindow(conn)}
+                        title="Терминал в новом окне"
+                      >
+                        <ExternalLink size={12} color="var(--accent-amber)" />
+                      </button>
+                      <button
+                        style={styles.actionBtn}
+                        onClick={() => handleDisconnect(conn.id)}
+                        title="Отключиться"
+                      >
+                        <WifiOff size={12} color="var(--accent-red)" />
+                      </button>
+                    </>
+                  )}
+                  {!isConnected && (
                     <button
                       style={styles.actionBtn}
-                      onClick={() => handleDisconnect(conn.id)}
-                      title="Отключиться"
+                      onClick={() => handleReconnect(conn)}
+                      title="Подключиться"
                     >
-                      <WifiOff size={12} color="var(--accent-red)" />
+                      <Wifi size={12} color="var(--accent-cyan)" />
                     </button>
-                  ) : null}
+                  )}
                   <button
                     style={styles.actionBtn}
                     onClick={() => handleDelete(conn.id)}
@@ -118,10 +180,11 @@ export function SSHConnectionList() {
         )}
       </div>
 
-      {showDialog && (
+      {(showDialog || reconnectConfig) && (
         <SSHConnectionDialog
-          onClose={() => setShowDialog(false)}
-          onConnect={handleConnect}
+          onClose={() => { setShowDialog(false); setReconnectConfig(null); }}
+          onConnect={handleDialogConnect}
+          initialConfig={reconnectConfig || undefined}
         />
       )}
     </div>
@@ -138,6 +201,11 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: '8px 14px 4px',
+  },
+  headerActions: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 2,
   },
   headerText: {
     fontSize: 'var(--font-size-xs)',
@@ -183,6 +251,7 @@ const styles: Record<string, React.CSSProperties> = {
     gap: 6,
     flex: 1,
     overflow: 'hidden',
+    cursor: 'pointer',
   },
   dot: {
     width: 6,

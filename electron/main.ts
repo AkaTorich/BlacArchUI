@@ -21,6 +21,7 @@ declare const MAIN_WINDOW_VITE_DEV_SERVER_URL: string | undefined;
 declare const MAIN_WINDOW_VITE_NAME: string;
 
 let mainWindow: BrowserWindow | null = null;
+let isQuitting = false;
 const terminalWindows = new Map<string, BrowserWindow>();
 
 const createWindow = () => {
@@ -45,6 +46,22 @@ const createWindow = () => {
       path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
   }
+
+  // When main window closes, close all child windows and quit
+  mainWindow.on('closed', () => {
+    console.log('[Window] mainWindow CLOSED event fired');
+    isQuitting = true;
+    mainWindow = null;
+    for (const win of terminalWindows.values()) {
+      if (!win.isDestroyed()) win.destroy();
+    }
+    terminalWindows.clear();
+    if (sshListWindow && !sshListWindow.isDestroyed()) {
+      sshListWindow.destroy();
+      sshListWindow = null;
+    }
+    app.quit();
+  });
 };
 
 function createTerminalWindow(opts: {
@@ -86,14 +103,58 @@ function createTerminalWindow(opts: {
   }
 
   win.on('closed', () => {
+    console.log(`[Window] terminal window CLOSED: ${opts.terminalId}`);
     terminalWindows.delete(opts.terminalId);
-    // Kill the terminal process when window closes
-    if (opts.sshConnectionId) {
-      // For SSH, just close the shell (not the connection)
-      sshManager.unregisterSender(opts.terminalId);
-    } else {
-      ptyManager.kill(opts.terminalId);
+    if (isQuitting) return;
+    try {
+      if (opts.sshConnectionId) {
+        sshManager.unregisterSender(opts.terminalId);
+      } else {
+        ptyManager.kill(opts.terminalId);
+      }
+    } catch (err) {
+      console.error('Error cleaning up terminal window:', err);
     }
+  });
+}
+
+let sshListWindow: BrowserWindow | null = null;
+
+function createSSHListWindow() {
+  // If already open, focus it
+  if (sshListWindow && !sshListWindow.isDestroyed()) {
+    sshListWindow.focus();
+    return;
+  }
+
+  sshListWindow = new BrowserWindow({
+    width: 420,
+    height: 500,
+    minWidth: 320,
+    minHeight: 300,
+    frame: false,
+    backgroundColor: '#0a0a0f',
+    webPreferences: {
+      preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: false,
+      contextIsolation: true,
+    },
+  });
+
+  const params = new URLSearchParams();
+  params.set('sshListWindow', '1');
+
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    sshListWindow.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}?${params.toString()}`);
+  } else {
+    sshListWindow.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
+      { search: params.toString() }
+    );
+  }
+
+  sshListWindow.on('closed', () => {
+    sshListWindow = null;
   });
 }
 
@@ -114,6 +175,11 @@ app.whenReady().then(async () => {
     createTerminalWindow(opts);
   });
 
+  // SSH list window handler
+  ipcMain.handle('ssh:openListWindow', () => {
+    createSSHListWindow();
+  });
+
   // Window control handlers — use event.sender to support multiple windows
   ipcMain.on('window:minimize', (event) => {
     BrowserWindow.fromWebContents(event.sender)?.minimize();
@@ -126,8 +192,33 @@ app.whenReady().then(async () => {
       win?.maximize();
     }
   });
+  // Safe close for child windows: cleanup first, then destroy (no renderer teardown)
+  ipcMain.on('window:closeChild', (event, terminalId?: string) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (!win || win === mainWindow) return;
+
+    // Cleanup pty/ssh before destroying
+    if (terminalId) {
+      try {
+        // Find what kind of terminal this is
+        const opts = [...terminalWindows.entries()].find(([, w]) => w === win);
+        if (opts) {
+          terminalWindows.delete(opts[0]);
+        }
+        ptyManager.kill(terminalId);
+        sshManager.unregisterSender(terminalId);
+      } catch (_) { /* ignore */ }
+    }
+
+    // Destroy immediately — no renderer cleanup, no crash
+    win.destroy();
+  });
+
   ipcMain.on('window:close', (event) => {
-    BrowserWindow.fromWebContents(event.sender)?.close();
+    const win = BrowserWindow.fromWebContents(event.sender);
+    if (win) {
+      win.close();
+    }
   });
 
   app.on('activate', () => {
@@ -138,7 +229,9 @@ app.whenReady().then(async () => {
 });
 
 app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
+  console.log('[Window] window-all-closed event fired');
+});
+
+app.on('before-quit', () => {
+  console.log('[Window] before-quit event fired');
 });

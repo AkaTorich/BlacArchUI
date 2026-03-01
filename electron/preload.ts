@@ -55,6 +55,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
     sshConnectionId?: string;
   }) => ipcRenderer.invoke('terminal:openWindow', opts),
 
+  // SSH list window
+  openSSHListWindow: () => ipcRenderer.invoke('ssh:openListWindow'),
+
+  // Safe close for terminal/child windows: cleanup first, then destroy
+  closeChildWindow: (terminalId?: string) =>
+    ipcRenderer.send('window:closeChild', terminalId),
+
   // Window controls
   windowMinimize: () => ipcRenderer.send('window:minimize'),
   windowMaximize: () => ipcRenderer.send('window:maximize'),

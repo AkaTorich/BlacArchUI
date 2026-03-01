@@ -6,6 +6,7 @@ import { MainPanel } from './components/layout/MainPanel';
 import { StatusBar } from './components/layout/StatusBar';
 import { TerminalTabs } from './components/terminal/TerminalTabs';
 import { TerminalWindow } from './components/terminal/TerminalWindow';
+import { SSHListWindow } from './components/ssh/SSHListWindow';
 
 function AppContent() {
   const { dispatch } = useAppContext();
@@ -44,7 +45,7 @@ function AppContent() {
 }
 
 export function App() {
-  // Check if this is a terminal window
+  // Check if this is a special window
   const params = new URLSearchParams(window.location.search);
   if (params.get('terminalWindow')) {
     const terminalId = params.get('terminalId') || `term-win-${Date.now()}`;
@@ -60,6 +61,10 @@ export function App() {
         sshConnectionId={sshConnectionId}
       />
     );
+  }
+
+  if (params.get('sshListWindow')) {
+    return <SSHListWindow />;
   }
 
   return (

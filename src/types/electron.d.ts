@@ -31,6 +31,10 @@ export interface ElectronAPI {
     sshConnectionId?: string;
   }) => Promise<void>;
 
+  openSSHListWindow: () => Promise<void>;
+
+  closeChildWindow: (terminalId?: string) => void;
+
   windowMinimize: () => void;
   windowMaximize: () => void;
   windowClose: () => void;

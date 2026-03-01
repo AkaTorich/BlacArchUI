@@ -5,16 +5,17 @@ import { ISSHConnectionConfig } from '../../types/ssh';
 interface SSHConnectionDialogProps {
   onClose: () => void;
   onConnect: (config: ISSHConnectionConfig) => void;
+  initialConfig?: ISSHConnectionConfig;
 }
 
-export function SSHConnectionDialog({ onClose, onConnect }: SSHConnectionDialogProps) {
-  const [label, setLabel] = useState('');
-  const [host, setHost] = useState('');
-  const [port, setPort] = useState('22');
-  const [username, setUsername] = useState('root');
-  const [authMethod, setAuthMethod] = useState<'password' | 'key'>('password');
+export function SSHConnectionDialog({ onClose, onConnect, initialConfig }: SSHConnectionDialogProps) {
+  const [label, setLabel] = useState(initialConfig?.label || '');
+  const [host, setHost] = useState(initialConfig?.host || '');
+  const [port, setPort] = useState(String(initialConfig?.port || 22));
+  const [username, setUsername] = useState(initialConfig?.username || 'root');
+  const [authMethod, setAuthMethod] = useState<'password' | 'key'>(initialConfig?.authMethod || 'password');
   const [password, setPassword] = useState('');
-  const [privateKeyPath, setPrivateKeyPath] = useState('');
+  const [privateKeyPath, setPrivateKeyPath] = useState(initialConfig?.privateKeyPath || '');
   const [error, setError] = useState('');
   const [connecting, setConnecting] = useState(false);
 
@@ -32,7 +33,7 @@ export function SSHConnectionDialog({ onClose, onConnect }: SSHConnectionDialogP
     setConnecting(true);
 
     const config: ISSHConnectionConfig = {
-      id: `ssh-${Date.now()}`,
+      id: initialConfig?.id || `ssh-${Date.now()}`,
       label: label.trim() || `${username}@${host}`,
       host: host.trim(),
       port: parseInt(port) || 22,

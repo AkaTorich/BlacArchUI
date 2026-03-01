@@ -24,7 +24,7 @@ export function TerminalWindow({ terminalId, title, command, sshConnectionId }: 
           <button style={styles.controlBtn} onClick={() => window.electronAPI.windowMaximize()}>
             <Square size={12} />
           </button>
-          <button style={{ ...styles.controlBtn, ...styles.closeBtn }} onClick={() => window.electronAPI.windowClose()}>
+          <button style={{ ...styles.controlBtn, ...styles.closeBtn }} onClick={() => window.electronAPI.closeChildWindow(terminalId)}>
             <X size={14} />
           </button>
         </div>
@@ -35,6 +35,7 @@ export function TerminalWindow({ terminalId, title, command, sshConnectionId }: 
           command={command}
           sshConnectionId={sshConnectionId}
           isActive={true}
+          skipKillOnUnmount={true}
         />
       </div>
     </div>

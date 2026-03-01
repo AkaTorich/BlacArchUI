@@ -141,7 +141,12 @@ export function TerminalPanel({ terminalId, command, sshConnectionId, isActive, 
       terminalRef.current = null;
       fitAddonRef.current = null;
       if (!sshConnectionId && !skipKillRef.current) {
-        window.electronAPI.ptyKill(terminalId);
+        // Use try-catch: IPC may fail if window is being destroyed
+        try {
+          window.electronAPI.ptyKill(terminalId).catch(() => {});
+        } catch (_) {
+          // Window already closing, ignore
+        }
       }
     };
   }, [terminalId]);
