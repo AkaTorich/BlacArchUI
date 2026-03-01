@@ -11,6 +11,7 @@ interface RemoteConnectionDialogProps {
     username: string;
     password: string;
     domain: string;
+    encryption: 'auto' | 'none' | 'encrypted';
   }) => void;
 }
 
@@ -20,10 +21,11 @@ export function RemoteConnectionDialog({ type, host, onClose, onConnect }: Remot
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [domain, setDomain] = useState('');
+  const [encryption, setEncryption] = useState<'auto' | 'none' | 'encrypted'>('auto');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onConnect({ host: hostValue, port, username, password, domain });
+    onConnect({ host: hostValue, port, username, password, domain, encryption });
   };
 
   const accentColor = type === 'rdp' ? 'var(--accent-blue)' : 'var(--accent-purple)';
@@ -68,28 +70,27 @@ export function RemoteConnectionDialog({ type, host, onClose, onConnect }: Remot
           </label>
 
           {type === 'rdp' && (
-            <>
-              <label style={styles.label}>
-                Домен
-                <input
-                  style={styles.input}
-                  value={domain}
-                  onChange={(e) => setDomain(e.target.value)}
-                  placeholder="Необязательно"
-                />
-              </label>
-              <label style={styles.label}>
-                Имя пользователя
-                <input
-                  style={styles.input}
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  placeholder="Administrator"
-                  required
-                />
-              </label>
-            </>
+            <label style={styles.label}>
+              Домен
+              <input
+                style={styles.input}
+                value={domain}
+                onChange={(e) => setDomain(e.target.value)}
+                placeholder="Необязательно"
+              />
+            </label>
           )}
+
+          <label style={styles.label}>
+            Имя пользователя
+            <input
+              style={styles.input}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder={type === 'rdp' ? 'Administrator' : 'Необязательно'}
+              required={type === 'rdp'}
+            />
+          </label>
 
           <label style={styles.label}>
             Пароль
@@ -102,6 +103,21 @@ export function RemoteConnectionDialog({ type, host, onClose, onConnect }: Remot
               required={type === 'rdp'}
             />
           </label>
+
+          {type === 'vnc' && (
+            <label style={styles.label}>
+              Шифрование
+              <select
+                style={styles.input}
+                value={encryption}
+                onChange={(e) => setEncryption(e.target.value as 'auto' | 'none' | 'encrypted')}
+              >
+                <option value="auto">Авто (любой)</option>
+                <option value="none">Без шифрования</option>
+                <option value="encrypted">Только шифрование</option>
+              </select>
+            </label>
+          )}
 
           <button
             type="submit"

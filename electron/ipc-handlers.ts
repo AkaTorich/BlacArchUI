@@ -68,16 +68,15 @@ export function registerIpcHandlers(
 
   // VNC
   ipcMain.handle('remote:vncConnect', async (_event, sessionId: string, host: string, port: number, _password?: string) => {
-    const wsPort = await vncProxy.startProxy(sessionId, host, port);
-    return { wsPort };
+    return await vncProxy.startProxy(sessionId, host, port);
   });
-  ipcMain.handle('remote:vncDisconnect', (_event, sessionId: string) => {
-    vncProxy.stopProxy(sessionId);
+  ipcMain.handle('remote:vncDisconnect', (_event, sessionId: string, generation?: number) => {
+    vncProxy.stopProxy(sessionId, generation);
   });
 
   // RDP
-  ipcMain.handle('remote:rdpConnect', (event, sessionId: string, host: string, port: number, username: string, password: string, domain?: string) => {
-    rdpManager.connect(sessionId, host, port, username, password, domain || '', event.sender);
+  ipcMain.handle('remote:rdpConnect', (event, sessionId: string, host: string, port: number, username: string, password: string, domain: string | undefined, screenWidth: number, screenHeight: number) => {
+    rdpManager.connect(sessionId, host, port, username, password, domain || '', screenWidth, screenHeight, event.sender);
   });
   ipcMain.handle('remote:rdpDisconnect', (_event, sessionId: string) => {
     rdpManager.disconnect(sessionId);

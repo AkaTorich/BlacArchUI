@@ -44,5 +44,11 @@
   {"id": "blackarch-threat-model", "nameRu": "Моделирование угроз", "nameEn": "Threat Model", "icon": "layout-list", "description": "Моделирование угроз и оценка рисков"},
   {"id": "blackarch-drone", "nameRu": "Дроны", "nameEn": "Drones", "icon": "plane", "description": "Тестирование безопасности дронов"},
   {"id": "blackarch-windows", "nameRu": "Windows", "nameEn": "Windows", "icon": "monitor", "description": "Инструменты для тестирования Windows-систем"},
-  {"id": "blackarch-misc", "nameRu": "Разное", "nameEn": "Misc", "icon": "layers", "description": "Прочие инструменты безопасности"}
+  {"id": "blackarch-misc", "nameRu": "Разное", "nameEn": "Misc", "icon": "layers", "description": "Прочие инструменты безопасности"},
+  {"id": "blackarch-ai", "nameRu": "ИИ безопасность", "nameEn": "AI Security", "icon": "brain", "description": "Безопасность машинного обучения и ИИ"},
+  {"id": "blackarch-automobile", "nameRu": "Автомобили", "nameEn": "Automobile", "icon": "car", "description": "Тестирование безопасности автомобильных систем (CAN bus)"},
+  {"id": "blackarch-radio", "nameRu": "Радио/SDR", "nameEn": "Radio/SDR", "icon": "radio-tower", "description": "Программно-определяемое радио и радиочастотный анализ"},
+  {"id": "blackarch-stego", "nameRu": "Стеганография", "nameEn": "Steganography", "icon": "image", "description": "Стеганография — скрытие данных в изображениях и файлах"},
+  {"id": "blackarch-wordlist", "nameRu": "Словари", "nameEn": "Wordlists", "icon": "list", "description": "Генераторы и коллекции словарей для брутфорса"},
+  {"id": "blackarch-config", "nameRu": "Конфигурация", "nameEn": "Config", "icon": "settings", "description": "Управление конфигурацией и настройками систем"}
 ]

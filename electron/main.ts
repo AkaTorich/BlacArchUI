@@ -179,6 +179,7 @@ function createRemoteDesktopWindow(opts: {
   username?: string;
   password?: string;
   domain?: string;
+  encryption?: 'auto' | 'none' | 'encrypted';
 }) {
   const win = new BrowserWindow({
     width: 1024,
@@ -206,6 +207,7 @@ function createRemoteDesktopWindow(opts: {
   if (opts.username) params.set('username', opts.username);
   if (opts.password) params.set('password', opts.password);
   if (opts.domain) params.set('domain', opts.domain);
+  if (opts.encryption) params.set('encryption', opts.encryption);
 
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
     win.loadURL(`${MAIN_WINDOW_VITE_DEV_SERVER_URL}?${params.toString()}`);
@@ -262,6 +264,7 @@ app.whenReady().then(async () => {
     username?: string;
     password?: string;
     domain?: string;
+    encryption?: 'auto' | 'none' | 'encrypted';
   }) => {
     createRemoteDesktopWindow(opts);
   });

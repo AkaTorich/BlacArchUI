@@ -12,10 +12,11 @@ interface RemoteDesktopWindowProps {
   username?: string;
   password?: string;
   domain?: string;
+  encryption?: 'auto' | 'none' | 'encrypted';
 }
 
 export function RemoteDesktopWindow({
-  sessionId, type, host, port, title, username, password, domain,
+  sessionId, type, host, port, title, username, password, domain, encryption,
 }: RemoteDesktopWindowProps) {
   return (
     <div style={styles.container}>
@@ -46,7 +47,9 @@ export function RemoteDesktopWindow({
             sessionId={sessionId}
             host={host}
             port={port}
+            username={username}
             password={password}
+            encryption={encryption}
           />
         ) : (
           <RDPViewer
@@ -127,5 +130,7 @@ const styles: Record<string, React.CSSProperties> = {
   viewerArea: {
     flex: 1,
     overflow: 'hidden',
+    position: 'relative',
+    minHeight: 0,
   },
 };

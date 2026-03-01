@@ -45,12 +45,13 @@ export interface ElectronAPI {
     username?: string;
     password?: string;
     domain?: string;
+    encryption?: 'auto' | 'none' | 'encrypted';
   }) => Promise<void>;
 
-  vncConnect: (sessionId: string, host: string, port: number, password?: string) => Promise<{ wsPort: number }>;
-  vncDisconnect: (sessionId: string) => Promise<void>;
+  vncConnect: (sessionId: string, host: string, port: number, password?: string) => Promise<{ wsPort: number; generation: number }>;
+  vncDisconnect: (sessionId: string, generation?: number) => Promise<void>;
 
-  rdpConnect: (sessionId: string, host: string, port: number, username: string, password: string, domain?: string) => Promise<void>;
+  rdpConnect: (sessionId: string, host: string, port: number, username: string, password: string, domain: string | undefined, screenWidth: number, screenHeight: number) => Promise<void>;
   rdpDisconnect: (sessionId: string) => Promise<void>;
   rdpSendMouse: (sessionId: string, x: number, y: number, button: number, isPressed: boolean) => void;
   rdpSendKey: (sessionId: string, scancode: number, isPressed: boolean, isExtended: boolean) => void;
@@ -60,12 +61,9 @@ export interface ElectronAPI {
   onRdpBitmap: (callback: (sessionId: string, bitmap: {
     destTop: number;
     destLeft: number;
-    destRight: number;
-    destBottom: number;
     width: number;
     height: number;
-    bitsPerPixel: number;
-    data: number[];
+    rgba: Uint8Array;
   }) => void) => () => void;
   onRdpClosed: (callback: (sessionId: string) => void) => () => void;
   onRdpError: (callback: (sessionId: string, error: string) => void) => () => void;

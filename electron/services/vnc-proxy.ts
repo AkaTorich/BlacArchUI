@@ -6,14 +6,17 @@ interface VNCProxySession {
   tcpSocket: net.Socket | null;
   wsClient: WebSocket | null;
   wsPort: number;
+  generation: number;
 }
 
 export class VNCProxy {
   private sessions: Map<string, VNCProxySession> = new Map();
+  private generationCounter = 0;
 
-  async startProxy(sessionId: string, host: string, vncPort: number): Promise<number> {
+  async startProxy(sessionId: string, host: string, vncPort: number): Promise<{ wsPort: number; generation: number }> {
     // Clean up any existing session with this ID
-    this.stopProxy(sessionId);
+    this.forceStopProxy(sessionId);
+    const generation = ++this.generationCounter;
 
     return new Promise((resolve, reject) => {
       const wsServer = new WebSocketServer({ port: 0, host: '127.0.0.1' });
@@ -31,11 +34,12 @@ export class VNCProxy {
           tcpSocket: null,
           wsClient: null,
           wsPort,
+          generation,
         };
         this.sessions.set(sessionId, session);
 
-        console.log(`[VNC Proxy] Session ${sessionId}: WS listening on 127.0.0.1:${wsPort} → ${host}:${vncPort}`);
-        resolve(wsPort);
+        console.log(`[VNC Proxy] Session ${sessionId} (gen ${generation}): WS listening on 127.0.0.1:${wsPort} → ${host}:${vncPort}`);
+        resolve({ wsPort, generation });
       });
 
       wsServer.on('connection', (ws) => {
@@ -55,22 +59,27 @@ export class VNCProxy {
         session.tcpSocket = tcpSocket;
 
         // TCP → WebSocket
+        let tcpBytesReceived = 0;
         tcpSocket.on('data', (data: Buffer) => {
+          tcpBytesReceived += data.length;
+          if (tcpBytesReceived <= 64) {
+            console.log(`[VNC Proxy] Session ${sessionId}: TCP→WS ${data.length} bytes (total ${tcpBytesReceived}), first bytes: ${data.subarray(0, Math.min(32, data.length)).toString('hex')} ascii: ${data.subarray(0, Math.min(32, data.length)).toString('ascii').replace(/[^\x20-\x7e]/g, '.')}`);
+          }
           if (ws.readyState === WebSocket.OPEN) {
             ws.send(data);
           }
         });
 
         // WebSocket → TCP
+        let wsBytesReceived = 0;
         ws.on('message', (data: Buffer | ArrayBuffer | Buffer[]) => {
+          const buf = Buffer.isBuffer(data) ? data : data instanceof ArrayBuffer ? Buffer.from(data) : Buffer.concat(data);
+          wsBytesReceived += buf.length;
+          if (wsBytesReceived <= 64) {
+            console.log(`[VNC Proxy] Session ${sessionId}: WS→TCP ${buf.length} bytes (total ${wsBytesReceived}), first bytes: ${buf.subarray(0, Math.min(32, buf.length)).toString('hex')} ascii: ${buf.subarray(0, Math.min(32, buf.length)).toString('ascii').replace(/[^\x20-\x7e]/g, '.')}`);
+          }
           if (tcpSocket.writable) {
-            if (Buffer.isBuffer(data)) {
-              tcpSocket.write(data);
-            } else if (data instanceof ArrayBuffer) {
-              tcpSocket.write(Buffer.from(data));
-            } else if (Array.isArray(data)) {
-              tcpSocket.write(Buffer.concat(data));
-            }
+            tcpSocket.write(buf);
           }
         });
 
@@ -102,11 +111,25 @@ export class VNCProxy {
     });
   }
 
-  stopProxy(sessionId: string): void {
+  // Stop only if generation matches (prevents StrictMode race condition)
+  stopProxy(sessionId: string, generation?: number): void {
     const session = this.sessions.get(sessionId);
     if (!session) return;
+    // If generation is provided and doesn't match, skip — a newer session took over
+    if (generation !== undefined && session.generation !== generation) return;
 
-    console.log(`[VNC Proxy] Stopping session ${sessionId}`);
+    this.doStop(sessionId, session);
+  }
+
+  // Force stop regardless of generation (used internally by startProxy)
+  private forceStopProxy(sessionId: string): void {
+    const session = this.sessions.get(sessionId);
+    if (!session) return;
+    this.doStop(sessionId, session);
+  }
+
+  private doStop(sessionId: string, session: VNCProxySession): void {
+    console.log(`[VNC Proxy] Stopping session ${sessionId} (gen ${session.generation})`);
     if (session.tcpSocket) {
       session.tcpSocket.destroy();
     }
@@ -119,7 +142,7 @@ export class VNCProxy {
 
   stopAll(): void {
     for (const id of this.sessions.keys()) {
-      this.stopProxy(id);
+      this.forceStopProxy(id);
     }
   }
 }

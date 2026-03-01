@@ -1,0 +1,13 @@
+const fs = require('fs');
+const tools = JSON.parse(fs.readFileSync('data/tools.json', 'utf8'));
+const withParams = tools.filter(t => t.parameters && t.parameters.length > 0);
+const without = tools.filter(t => !t.parameters || t.parameters.length === 0);
+console.log('Всего утилит: ' + tools.length);
+console.log('С аргументами: ' + withParams.length);
+console.log('Без аргументов: ' + without.length);
+console.log('');
+console.log('=== С АРГУМЕНТАМИ ===');
+withParams.forEach(t => console.log(t.id + ':' + t.parameters.length + ':' + t.categories.join(',')));
+console.log('');
+console.log('=== БЕЗ АРГУМЕНТОВ ===');
+without.forEach(t => console.log(t.id + ':0:' + t.categories.join(',')));

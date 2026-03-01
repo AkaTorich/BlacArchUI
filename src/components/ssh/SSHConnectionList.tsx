@@ -77,7 +77,7 @@ export function SSHConnectionList() {
     setRemoteDialog({ type, host: conn.host });
   };
 
-  const handleRemoteConnect = (config: { host: string; port: number; username: string; password: string; domain: string }) => {
+  const handleRemoteConnect = (config: { host: string; port: number; username: string; password: string; domain: string; encryption: 'auto' | 'none' | 'encrypted' }) => {
     if (!remoteDialog) return;
     const sessionId = `${remoteDialog.type}-${Date.now()}`;
     const title = `${remoteDialog.type.toUpperCase()}: ${config.host}`;
@@ -90,6 +90,7 @@ export function SSHConnectionList() {
       username: config.username || undefined,
       password: config.password || undefined,
       domain: config.domain || undefined,
+      encryption: config.encryption,
     });
     setRemoteDialog(null);
   };

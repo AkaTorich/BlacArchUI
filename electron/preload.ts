@@ -72,15 +72,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
     username?: string;
     password?: string;
     domain?: string;
+    encryption?: 'auto' | 'none' | 'encrypted';
   }) => ipcRenderer.invoke('remote:openWindow', opts),
 
   vncConnect: (sessionId: string, host: string, port: number, password?: string) =>
     ipcRenderer.invoke('remote:vncConnect', sessionId, host, port, password),
-  vncDisconnect: (sessionId: string) =>
-    ipcRenderer.invoke('remote:vncDisconnect', sessionId),
+  vncDisconnect: (sessionId: string, generation?: number) =>
+    ipcRenderer.invoke('remote:vncDisconnect', sessionId, generation),
 
-  rdpConnect: (sessionId: string, host: string, port: number, username: string, password: string, domain?: string) =>
-    ipcRenderer.invoke('remote:rdpConnect', sessionId, host, port, username, password, domain),
+  rdpConnect: (sessionId: string, host: string, port: number, username: string, password: string, domain: string | undefined, screenWidth: number, screenHeight: number) =>
+    ipcRenderer.invoke('remote:rdpConnect', sessionId, host, port, username, password, domain, screenWidth, screenHeight),
   rdpDisconnect: (sessionId: string) =>
     ipcRenderer.invoke('remote:rdpDisconnect', sessionId),
   rdpSendMouse: (sessionId: string, x: number, y: number, button: number, isPressed: boolean) =>

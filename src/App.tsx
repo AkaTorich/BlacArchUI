@@ -79,6 +79,7 @@ export function App() {
         username={params.get('username') || undefined}
         password={params.get('password') || undefined}
         domain={params.get('domain') || undefined}
+        encryption={(params.get('encryption') as 'auto' | 'none' | 'encrypted') || 'auto'}
       />
     );
   }

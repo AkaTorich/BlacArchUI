@@ -65,71 +65,89 @@ const KEY_TO_SCANCODE: Record<string, [number, boolean]> = {
   MetaLeft: [0x5B, true], MetaRight: [0x5C, true],
 };
 
+function measureContainer(el: HTMLElement): { w: number; h: number } {
+  const rect = el.getBoundingClientRect();
+  // Use even dimensions (RDP protocol requires this)
+  return {
+    w: Math.floor(rect.width / 2) * 2 || 1280,
+    h: Math.floor(rect.height / 2) * 2 || 800,
+  };
+}
+
 export function RDPViewer({ sessionId, host, port, username, password, domain }: RDPViewerProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [status, setStatus] = useState<'connecting' | 'connected' | 'disconnected' | 'error'>('connecting');
   const [errorMsg, setErrorMsg] = useState('');
-  const scaleRef = useRef({ sx: 1, sy: 1 });
+  const [screenSize, setScreenSize] = useState<{ w: number; h: number } | null>(null);
 
+  // Measure container and watch for resize — debounced reconnect on size change
   useEffect(() => {
-    let cancelled = false;
+    const el = containerRef.current;
+    if (!el) return;
 
-    // Set up RDP event listeners
+    // Initial measurement
+    setScreenSize(measureContainer(el));
+
+    let debounceTimer: ReturnType<typeof setTimeout>;
+    const observer = new ResizeObserver(() => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => {
+        const newSize = measureContainer(el);
+        setScreenSize(prev => {
+          if (prev && prev.w === newSize.w && prev.h === newSize.h) return prev;
+          return newSize;
+        });
+      }, 500);
+    });
+    observer.observe(el);
+
+    return () => {
+      clearTimeout(debounceTimer);
+      observer.disconnect();
+    };
+  }, []);
+
+  // Connect to RDP once we know the screen size; reconnect on size change
+  useEffect(() => {
+    if (!screenSize) return;
+    let cancelled = false;
+    let ctx: CanvasRenderingContext2D | null = null;
+
+    // Bitmap batching — collect updates, paint in one rAF
+    type BitmapUpdate = { destLeft: number; destTop: number; width: number; height: number; rgba: Uint8Array };
+    const pendingBitmaps: BitmapUpdate[] = [];
+    let paintRaf = 0;
+
+    const flushBitmaps = () => {
+      paintRaf = 0;
+      if (!ctx) {
+        const canvas = canvasRef.current;
+        if (canvas) ctx = canvas.getContext('2d');
+      }
+      if (!ctx) return;
+
+      for (let i = 0; i < pendingBitmaps.length; i++) {
+        const b = pendingBitmaps[i];
+        const imgData = new ImageData(
+          new Uint8ClampedArray(b.rgba.buffer, b.rgba.byteOffset, b.width * b.height * 4),
+          b.width, b.height
+        );
+        ctx.putImageData(imgData, b.destLeft, b.destTop);
+      }
+      pendingBitmaps.length = 0;
+    };
+
+    setStatus('connecting');
+
     const cleanupConnected = window.electronAPI.onRdpConnected((sid) => {
       if (sid === sessionId && !cancelled) setStatus('connected');
     });
 
     const cleanupBitmap = window.electronAPI.onRdpBitmap((sid, bitmap) => {
       if (sid !== sessionId || cancelled) return;
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-
-      const w = bitmap.width;
-      const h = bitmap.height;
-      const bpp = bitmap.bitsPerPixel;
-
-      // Create ImageData from bitmap
-      const imgData = ctx.createImageData(w, h);
-      const src = bitmap.data;
-
-      if (bpp === 32) {
-        // BGRA → RGBA
-        for (let i = 0; i < w * h; i++) {
-          imgData.data[i * 4] = src[i * 4 + 2];     // R
-          imgData.data[i * 4 + 1] = src[i * 4 + 1]; // G
-          imgData.data[i * 4 + 2] = src[i * 4];     // B
-          imgData.data[i * 4 + 3] = 255;             // A
-        }
-      } else if (bpp === 24) {
-        // BGR → RGBA
-        for (let i = 0; i < w * h; i++) {
-          imgData.data[i * 4] = src[i * 3 + 2];
-          imgData.data[i * 4 + 1] = src[i * 3 + 1];
-          imgData.data[i * 4 + 2] = src[i * 3];
-          imgData.data[i * 4 + 3] = 255;
-        }
-      } else if (bpp === 16) {
-        for (let i = 0; i < w * h; i++) {
-          const pixel = src[i * 2] | (src[i * 2 + 1] << 8);
-          imgData.data[i * 4] = ((pixel >> 11) & 0x1F) * 255 / 31;
-          imgData.data[i * 4 + 1] = ((pixel >> 5) & 0x3F) * 255 / 63;
-          imgData.data[i * 4 + 2] = (pixel & 0x1F) * 255 / 31;
-          imgData.data[i * 4 + 3] = 255;
-        }
-      } else if (bpp === 15) {
-        for (let i = 0; i < w * h; i++) {
-          const pixel = src[i * 2] | (src[i * 2 + 1] << 8);
-          imgData.data[i * 4] = ((pixel >> 10) & 0x1F) * 255 / 31;
-          imgData.data[i * 4 + 1] = ((pixel >> 5) & 0x1F) * 255 / 31;
-          imgData.data[i * 4 + 2] = (pixel & 0x1F) * 255 / 31;
-          imgData.data[i * 4 + 3] = 255;
-        }
-      }
-
-      ctx.putImageData(imgData, bitmap.destLeft, bitmap.destTop);
+      pendingBitmaps.push(bitmap);
+      if (!paintRaf) paintRaf = requestAnimationFrame(flushBitmaps);
     });
 
     const cleanupClosed = window.electronAPI.onRdpClosed((sid) => {
@@ -143,8 +161,7 @@ export function RDPViewer({ sessionId, host, port, username, password, domain }:
       }
     });
 
-    // Connect
-    window.electronAPI.rdpConnect(sessionId, host, port, username, password, domain)
+    window.electronAPI.rdpConnect(sessionId, host, port, username, password, domain, screenSize.w, screenSize.h)
       .catch((err: any) => {
         if (!cancelled) {
           setStatus('error');
@@ -154,45 +171,37 @@ export function RDPViewer({ sessionId, host, port, username, password, domain }:
 
     return () => {
       cancelled = true;
+      if (paintRaf) cancelAnimationFrame(paintRaf);
       cleanupConnected();
       cleanupBitmap();
       cleanupClosed();
       cleanupError();
       window.electronAPI.rdpDisconnect(sessionId).catch(() => {});
     };
-  }, [sessionId, host, port, username, password, domain]);
-
-  // Update scale on resize
-  useEffect(() => {
-    const updateScale = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-      const rect = canvas.getBoundingClientRect();
-      scaleRef.current = {
-        sx: canvas.width / rect.width,
-        sy: canvas.height / rect.height,
-      };
-    };
-
-    updateScale();
-    window.addEventListener('resize', updateScale);
-    return () => window.removeEventListener('resize', updateScale);
-  }, []);
+  }, [sessionId, host, port, username, password, domain, screenSize]);
 
   const getScaledCoords = useCallback((e: React.MouseEvent) => {
     const canvas = canvasRef.current;
     if (!canvas) return { x: 0, y: 0 };
     const rect = canvas.getBoundingClientRect();
+    // Scale from CSS pixels to canvas pixels (handles DPI/fractional sizing)
+    const sx = canvas.width / rect.width;
+    const sy = canvas.height / rect.height;
     return {
-      x: Math.round((e.clientX - rect.left) * scaleRef.current.sx),
-      y: Math.round((e.clientY - rect.top) * scaleRef.current.sy),
+      x: Math.round((e.clientX - rect.left) * sx),
+      y: Math.round((e.clientY - rect.top) * sy),
     };
   }, []);
 
+  const mouseMoveRaf = useRef<number>(0);
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
     if (status !== 'connected') return;
     const { x, y } = getScaledCoords(e);
-    window.electronAPI.rdpSendMouse(sessionId, x, y, 0, false);
+    if (mouseMoveRaf.current) return;
+    mouseMoveRaf.current = requestAnimationFrame(() => {
+      mouseMoveRaf.current = 0;
+      window.electronAPI.rdpSendMouse(sessionId, x, y, 0, false);
+    });
   }, [sessionId, status, getScaledCoords]);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -235,7 +244,7 @@ export function RDPViewer({ sessionId, host, port, username, password, domain }:
   }, [sessionId, status]);
 
   return (
-    <div style={styles.container}>
+    <div ref={containerRef} style={styles.container}>
       {status === 'connecting' && (
         <div style={styles.overlay}>
           <span style={styles.statusText}>Подключение к RDP {host}:{port}...</span>
@@ -255,20 +264,22 @@ export function RDPViewer({ sessionId, host, port, username, password, domain }:
           </span>
         </div>
       )}
-      <canvas
-        ref={canvasRef}
-        width={1280}
-        height={800}
-        style={styles.canvas}
-        tabIndex={0}
-        onMouseMove={handleMouseMove}
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onWheel={handleWheel}
-        onKeyDown={handleKeyDown}
-        onKeyUp={handleKeyUp}
-        onContextMenu={(e) => e.preventDefault()}
-      />
+      {screenSize && (
+        <canvas
+          ref={canvasRef}
+          width={screenSize.w}
+          height={screenSize.h}
+          style={styles.canvas}
+          tabIndex={0}
+          onMouseMove={handleMouseMove}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onWheel={handleWheel}
+          onKeyDown={handleKeyDown}
+          onKeyUp={handleKeyUp}
+          onContextMenu={(e) => e.preventDefault()}
+        />
+      )}
     </div>
   );
 }
@@ -282,9 +293,9 @@ const styles: Record<string, React.CSSProperties> = {
     overflow: 'hidden',
   },
   canvas: {
+    display: 'block',
     width: '100%',
     height: '100%',
-    objectFit: 'contain',
     outline: 'none',
     cursor: 'default',
   },
