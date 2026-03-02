@@ -33,7 +33,6 @@ function copyDirSync(src, dest) {
 module.exports = {
   packagerConfig: {
     asar: false,
-    name: 'BlacArchUI',
     extraResource: ['./data'],
     ignore: (file) => {
       if (!file) return false;
@@ -85,15 +84,7 @@ module.exports = {
     },
     {
       name: '@electron-forge/maker-zip',
-      platforms: ['darwin'],
-    },
-    {
-      name: '@electron-forge/maker-deb',
-      config: {},
-    },
-    {
-      name: '@electron-forge/maker-rpm',
-      config: {},
+      platforms: ['darwin', 'linux'],
     },
   ],
   plugins: [
