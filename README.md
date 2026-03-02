@@ -33,8 +33,11 @@ BlacArchUI — десктопное приложение для пентесте
 
 <p align="center">
   <img src="screenshots/vnc.jpg" alt="VNC" width="400" />
+  </br>
   <img src="screenshots/terminal.jpg" alt="Terminal" width="400" />
+  </br>
   <img src="screenshots/rdp.png" alt="Terminal" width="400" />
+  </br>
 </p>
 
 ## Требования
