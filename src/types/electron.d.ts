@@ -68,9 +68,25 @@ export interface ElectronAPI {
   onRdpClosed: (callback: (sessionId: string) => void) => () => void;
   onRdpError: (callback: (sessionId: string, error: string) => void) => () => void;
 
+  // SFTP
+  sftpList: (connectionId: string, remotePath: string) => Promise<SftpFileEntry[]>;
+  sftpMkdir: (connectionId: string, remotePath: string) => Promise<void>;
+  sftpDelete: (connectionId: string, remotePath: string, isDir: boolean) => Promise<void>;
+  sftpRename: (connectionId: string, oldPath: string, newPath: string) => Promise<void>;
+  sftpDownload: (connectionId: string, remotePath: string) => Promise<boolean>;
+  sftpUpload: (connectionId: string, remoteDir: string) => Promise<string | null>;
+
   windowMinimize: () => void;
   windowMaximize: () => void;
   windowClose: () => void;
+}
+
+export interface SftpFileEntry {
+  name: string;
+  type: 'file' | 'directory' | 'symlink';
+  size: number;
+  modifyTime: number;
+  permissions: number;
 }
 
 declare global {

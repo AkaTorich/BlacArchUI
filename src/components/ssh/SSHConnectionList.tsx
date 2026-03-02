@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { Wifi, WifiOff, Plus, Trash2, Server, Terminal, ExternalLink, Monitor } from 'lucide-react';
+import { Wifi, WifiOff, Plus, Trash2, Server, Terminal, ExternalLink, Monitor, FolderOpen } from 'lucide-react';
 import { ISSHConnectionConfig } from '../../types/ssh';
 import { SSHConnectionDialog } from './SSHConnectionDialog';
 import { RemoteConnectionDialog } from '../remote/RemoteConnectionDialog';
 
-export function SSHConnectionList() {
+interface SSHConnectionListProps {
+  onOpenFileBrowser?: (connectionId: string, label: string) => void;
+}
+
+export function SSHConnectionList({ onOpenFileBrowser }: SSHConnectionListProps = {}) {
   const [connections, setConnections] = useState<ISSHConnectionConfig[]>([]);
   const [connectedIds, setConnectedIds] = useState<Set<string>>(new Set());
   const [showDialog, setShowDialog] = useState(false);
@@ -164,6 +168,13 @@ export function SSHConnectionList() {
                         title="Открыть терминал"
                       >
                         <Terminal size={12} color="var(--accent-green)" />
+                      </button>
+                      <button
+                        style={styles.actionBtn}
+                        onClick={() => onOpenFileBrowser?.(conn.id, conn.label)}
+                        title="Файловый браузер"
+                      >
+                        <FolderOpen size={12} color="var(--accent-amber)" />
                       </button>
                       <button
                         style={styles.actionBtn}

@@ -112,6 +112,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
     return () => ipcRenderer.removeListener('rdp:error', handler);
   },
 
+  // SFTP
+  sftpList: (connectionId: string, remotePath: string) =>
+    ipcRenderer.invoke('sftp:list', connectionId, remotePath),
+  sftpMkdir: (connectionId: string, remotePath: string) =>
+    ipcRenderer.invoke('sftp:mkdir', connectionId, remotePath),
+  sftpDelete: (connectionId: string, remotePath: string, isDir: boolean) =>
+    ipcRenderer.invoke('sftp:delete', connectionId, remotePath, isDir),
+  sftpRename: (connectionId: string, oldPath: string, newPath: string) =>
+    ipcRenderer.invoke('sftp:rename', connectionId, oldPath, newPath),
+  sftpDownload: (connectionId: string, remotePath: string) =>
+    ipcRenderer.invoke('sftp:download', connectionId, remotePath),
+  sftpUpload: (connectionId: string, remoteDir: string) =>
+    ipcRenderer.invoke('sftp:upload', connectionId, remoteDir),
+
   // Window controls
   windowMinimize: () => ipcRenderer.send('window:minimize'),
   windowMaximize: () => ipcRenderer.send('window:maximize'),

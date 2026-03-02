@@ -1,4 +1,5 @@
-import { ipcMain } from 'electron';
+import { ipcMain, dialog, BrowserWindow } from 'electron';
+import path from 'node:path';
 import { ToolDatabase } from './services/tool-database';
 import { PtyManager } from './services/pty-manager';
 import { SSHManager, SSHConnectionConfig } from './services/ssh-manager';
@@ -89,5 +90,46 @@ export function registerIpcHandlers(
   });
   ipcMain.on('remote:rdpWheel', (_event, sessionId: string, x: number, y: number, step: number, isNegative: boolean, isHorizontal: boolean) => {
     rdpManager.sendWheel(sessionId, x, y, step, isNegative, isHorizontal);
+  });
+
+  // SFTP
+  ipcMain.handle('sftp:list', async (_event, connectionId: string, remotePath: string) => {
+    return await sshManager.sftpList(connectionId, remotePath);
+  });
+
+  ipcMain.handle('sftp:mkdir', async (_event, connectionId: string, remotePath: string) => {
+    await sshManager.sftpMkdir(connectionId, remotePath);
+  });
+
+  ipcMain.handle('sftp:delete', async (_event, connectionId: string, remotePath: string, isDir: boolean) => {
+    await sshManager.sftpDelete(connectionId, remotePath, isDir);
+  });
+
+  ipcMain.handle('sftp:rename', async (_event, connectionId: string, oldPath: string, newPath: string) => {
+    await sshManager.sftpRename(connectionId, oldPath, newPath);
+  });
+
+  ipcMain.handle('sftp:download', async (event, connectionId: string, remotePath: string) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const result = await dialog.showSaveDialog(win!, {
+      defaultPath: path.basename(remotePath),
+      title: 'Сохранить файл',
+    });
+    if (result.canceled || !result.filePath) return false;
+    await sshManager.sftpDownload(connectionId, remotePath, result.filePath);
+    return true;
+  });
+
+  ipcMain.handle('sftp:upload', async (event, connectionId: string, remoteDir: string) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+    const result = await dialog.showOpenDialog(win!, {
+      title: 'Загрузить файл на сервер',
+      properties: ['openFile'],
+    });
+    if (result.canceled || !result.filePaths.length) return null;
+    const localPath = result.filePaths[0];
+    const remotePath = remoteDir + '/' + path.basename(localPath);
+    await sshManager.sftpUpload(connectionId, localPath, remotePath);
+    return path.basename(localPath);
   });
 }

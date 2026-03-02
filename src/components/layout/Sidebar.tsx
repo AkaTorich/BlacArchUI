@@ -4,12 +4,16 @@ import { CategoryTree } from '../tools/CategoryTree';
 import { SSHConnectionList } from '../ssh/SSHConnectionList';
 import { Shield } from 'lucide-react';
 
-export function Sidebar() {
+interface SidebarProps {
+  onOpenFileBrowser?: (connectionId: string, label: string) => void;
+}
+
+export function Sidebar({ onOpenFileBrowser }: SidebarProps) {
   return (
     <div style={styles.sidebar}>
       <ToolSearch />
       <CategoryTree />
-      <SSHConnectionList />
+      <SSHConnectionList onOpenFileBrowser={onOpenFileBrowser} />
       <div style={styles.footer}>
         <Shield size={12} color="var(--accent-green)" />
         <span style={styles.footerText}>BlackArch Tools</span>

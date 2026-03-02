@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { AppProvider, useAppContext } from './context/AppContext';
 import { TitleBar } from './components/layout/TitleBar';
 import { Sidebar } from './components/layout/Sidebar';
@@ -8,9 +8,11 @@ import { TerminalTabs } from './components/terminal/TerminalTabs';
 import { TerminalWindow } from './components/terminal/TerminalWindow';
 import { SSHListWindow } from './components/ssh/SSHListWindow';
 import { RemoteDesktopWindow } from './components/remote/RemoteDesktopWindow';
+import { FileBrowser } from './components/files/FileBrowser';
 
 function AppContent() {
   const { dispatch } = useAppContext();
+  const [fileBrowser, setFileBrowser] = useState<{ connectionId: string; label: string } | null>(null);
 
   useEffect(() => {
     async function loadData() {
@@ -30,15 +32,30 @@ function AppContent() {
     loadData();
   }, [dispatch]);
 
+  const handleOpenFileBrowser = useCallback((connectionId: string, label: string) => {
+    setFileBrowser({ connectionId, label });
+  }, []);
+
+  const handleCloseFileBrowser = useCallback(() => {
+    setFileBrowser(null);
+  }, []);
+
   return (
     <div style={styles.app}>
       <TitleBar />
       <div style={styles.body}>
-        <Sidebar />
+        <Sidebar onOpenFileBrowser={handleOpenFileBrowser} />
         <div style={styles.mainArea}>
           <MainPanel />
           <TerminalTabs />
         </div>
+        {fileBrowser && (
+          <FileBrowser
+            connectionId={fileBrowser.connectionId}
+            connectionLabel={fileBrowser.label}
+            onClose={handleCloseFileBrowser}
+          />
+        )}
       </div>
       <StatusBar />
     </div>

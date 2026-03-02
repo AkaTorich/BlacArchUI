@@ -1,4 +1,4 @@
-import { Client, ClientChannel } from 'ssh2';
+import { Client, ClientChannel, SFTPWrapper } from 'ssh2';
 import { BrowserWindow } from 'electron';
 
 export interface SSHConnectionConfig {
@@ -12,10 +12,19 @@ export interface SSHConnectionConfig {
   privateKeyPath?: string;
 }
 
+export interface SftpFileEntry {
+  name: string;
+  type: 'file' | 'directory' | 'symlink';
+  size: number;
+  modifyTime: number;
+  permissions: number;
+}
+
 interface SSHSession {
   client: Client;
   config: SSHConnectionConfig;
   shells: Map<string, ClientChannel>;
+  sftpClient?: SFTPWrapper;
 }
 
 export class SSHManager {
@@ -178,6 +187,98 @@ export class SSHManager {
       session.client.end();
       this.sessions.delete(connectionId);
     }
+  }
+
+  // ── SFTP ──────────────────────────────────────────────
+
+  private async getSftp(connectionId: string): Promise<SFTPWrapper> {
+    const session = this.sessions.get(connectionId);
+    if (!session) throw new Error(`Not connected: ${connectionId}`);
+    if (session.sftpClient) return session.sftpClient;
+
+    return new Promise((resolve, reject) => {
+      session.client.sftp((err, sftp) => {
+        if (err) return reject(err);
+        session.sftpClient = sftp;
+        resolve(sftp);
+      });
+    });
+  }
+
+  async sftpList(connectionId: string, remotePath: string): Promise<SftpFileEntry[]> {
+    const sftp = await this.getSftp(connectionId);
+    return new Promise((resolve, reject) => {
+      sftp.readdir(remotePath, (err, list) => {
+        if (err) return reject(err);
+        const entries: SftpFileEntry[] = list.map((item) => {
+          let type: SftpFileEntry['type'] = 'file';
+          if (item.attrs.isDirectory()) type = 'directory';
+          else if (item.attrs.isSymbolicLink()) type = 'symlink';
+          return {
+            name: item.filename,
+            type,
+            size: item.attrs.size,
+            modifyTime: item.attrs.mtime * 1000,
+            permissions: item.attrs.mode & 0o7777,
+          };
+        });
+        entries.sort((a, b) => {
+          if (a.type === 'directory' && b.type !== 'directory') return -1;
+          if (a.type !== 'directory' && b.type === 'directory') return 1;
+          return a.name.localeCompare(b.name);
+        });
+        resolve(entries);
+      });
+    });
+  }
+
+  async sftpMkdir(connectionId: string, remotePath: string): Promise<void> {
+    const sftp = await this.getSftp(connectionId);
+    return new Promise((resolve, reject) => {
+      sftp.mkdir(remotePath, (err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+  }
+
+  async sftpDelete(connectionId: string, remotePath: string, isDir: boolean): Promise<void> {
+    const sftp = await this.getSftp(connectionId);
+    return new Promise((resolve, reject) => {
+      const cb = (err: any) => { if (err) reject(err); else resolve(); };
+      if (isDir) sftp.rmdir(remotePath, cb);
+      else sftp.unlink(remotePath, cb);
+    });
+  }
+
+  async sftpRename(connectionId: string, oldPath: string, newPath: string): Promise<void> {
+    const sftp = await this.getSftp(connectionId);
+    return new Promise((resolve, reject) => {
+      sftp.rename(oldPath, newPath, (err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+  }
+
+  async sftpDownload(connectionId: string, remotePath: string, localPath: string): Promise<void> {
+    const sftp = await this.getSftp(connectionId);
+    return new Promise((resolve, reject) => {
+      sftp.fastGet(remotePath, localPath, (err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
+  }
+
+  async sftpUpload(connectionId: string, localPath: string, remotePath: string): Promise<void> {
+    const sftp = await this.getSftp(connectionId);
+    return new Promise((resolve, reject) => {
+      sftp.fastPut(localPath, remotePath, (err) => {
+        if (err) return reject(err);
+        resolve();
+      });
+    });
   }
 
   getConnections(): string[] {
