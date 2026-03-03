@@ -39,6 +39,12 @@ export function registerIpcHandlers(
   ipcMain.handle('pty:kill', (_event, terminalId: string) =>
     ptyManager.kill(terminalId)
   );
+  ipcMain.handle('pty:getBuffer', (_event, terminalId: string) =>
+    ptyManager.getOutputBuffer(terminalId)
+  );
+  ipcMain.handle('ssh:getBuffer', (_event, terminalId: string) =>
+    sshManager.getOutputBuffer(terminalId)
+  );
 
   // SSH
   ipcMain.handle('ssh:connect', async (_event, config: SSHConnectionConfig) => {
@@ -50,8 +56,10 @@ export function registerIpcHandlers(
     sshManager.disconnect(connectionId);
   });
   ipcMain.handle('ssh:openShell', async (event, connectionId: string, terminalId: string) => {
+    const existed = sshManager.hasShell(connectionId, terminalId);
     sshManager.registerSender(terminalId, event.sender);
     await sshManager.openShell(connectionId, terminalId);
+    return { reused: existed };
   });
   ipcMain.on('ssh:writeToShell', (_event, connectionId: string, terminalId: string, data: string) => {
     sshManager.writeToShell(connectionId, terminalId, data);

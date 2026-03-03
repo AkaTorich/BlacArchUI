@@ -1,5 +1,5 @@
 import React from 'react';
-import { Minus, Square, X, Terminal as TerminalIcon } from 'lucide-react';
+import { Minus, Square, X, Terminal as TerminalIcon, PanelBottomOpen } from 'lucide-react';
 import { TerminalPanel } from './TerminalPanel';
 
 interface TerminalWindowProps {
@@ -10,6 +10,15 @@ interface TerminalWindowProps {
 }
 
 export function TerminalWindow({ terminalId, title, command, sshConnectionId }: TerminalWindowProps) {
+  const handleDock = () => {
+    window.electronAPI.dockTerminal({
+      terminalId,
+      title,
+      command,
+      sshConnectionId,
+    });
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.titleBar}>
@@ -18,6 +27,9 @@ export function TerminalWindow({ terminalId, title, command, sshConnectionId }: 
           <span style={styles.title}>{title}</span>
         </div>
         <div style={styles.controls}>
+          <button style={styles.controlBtn} onClick={handleDock} title="Свернуть в панель">
+            <PanelBottomOpen size={13} />
+          </button>
           <button style={styles.controlBtn} onClick={() => window.electronAPI.windowMinimize()}>
             <Minus size={14} />
           </button>
@@ -97,5 +109,6 @@ const styles: Record<string, React.CSSProperties> = {
   terminalArea: {
     flex: 1,
     overflow: 'hidden',
+    position: 'relative',
   },
 };

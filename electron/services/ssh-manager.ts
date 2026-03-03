@@ -27,9 +27,12 @@ interface SSHSession {
   sftpClient?: SFTPWrapper;
 }
 
+const MAX_SCROLLBACK = 100_000;
+
 export class SSHManager {
   private sessions: Map<string, SSHSession> = new Map();
   private senders: Map<string, Electron.WebContents> = new Map();
+  private outputBuffers: Map<string, string> = new Map();
   private mainWindow: BrowserWindow | null = null;
 
   setMainWindow(window: BrowserWindow) {
@@ -42,6 +45,10 @@ export class SSHManager {
 
   unregisterSender(terminalId: string) {
     this.senders.delete(terminalId);
+  }
+
+  getOutputBuffer(terminalId: string): string {
+    return this.outputBuffers.get(terminalId) || '';
   }
 
   private getSender(terminalId: string): Electron.WebContents | null {
@@ -121,10 +128,20 @@ export class SSHManager {
     });
   }
 
+  hasShell(connectionId: string, terminalId: string): boolean {
+    const session = this.sessions.get(connectionId);
+    return !!session?.shells.has(terminalId);
+  }
+
   async openShell(connectionId: string, terminalId: string): Promise<void> {
     const session = this.sessions.get(connectionId);
     if (!session) {
       throw new Error(`Not connected: ${connectionId}`);
+    }
+
+    // If shell already exists for this terminalId, reuse it (dock scenario)
+    if (session.shells.has(terminalId)) {
+      return;
     }
 
     return new Promise((resolve, reject) => {
@@ -138,15 +155,21 @@ export class SSHManager {
           session.shells.set(terminalId, stream);
 
           stream.on('data', (data: Buffer) => {
+            const str = data.toString();
+            // Append to ring buffer
+            const buf = (this.outputBuffers.get(terminalId) || '') + str;
+            this.outputBuffers.set(terminalId, buf.length > MAX_SCROLLBACK ? buf.slice(-MAX_SCROLLBACK) : buf);
+
             const sender = this.getSender(terminalId);
             if (sender) {
-              sender.send('pty:data', terminalId, data.toString());
+              sender.send('pty:data', terminalId, str);
             }
           });
 
           stream.on('close', () => {
             session.shells.delete(terminalId);
             this.senders.delete(terminalId);
+            this.outputBuffers.delete(terminalId);
             const sender = this.getSender(terminalId);
             if (sender) {
               sender.send('pty:exit', terminalId, 0);

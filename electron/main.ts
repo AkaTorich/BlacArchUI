@@ -281,6 +281,28 @@ app.whenReady().then(async () => {
       win?.maximize();
     }
   });
+  // Dock terminal back into main window panel
+  ipcMain.on('terminal:dock', (event, opts: { terminalId: string; title: string; command?: string; sshConnectionId?: string }) => {
+    const win = BrowserWindow.fromWebContents(event.sender);
+
+    // Forward to main window so TerminalTabs can pick it up
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('terminal:docked', opts);
+    }
+
+    // Close the external terminal window without killing the PTY/SSH shell
+    if (win && win !== mainWindow) {
+      terminalWindows.delete(opts.terminalId);
+      // Unregister sender so the new window can re-register
+      if (opts.sshConnectionId) {
+        sshManager.unregisterSender(opts.terminalId);
+      } else {
+        ptyManager.unregisterSender(opts.terminalId);
+      }
+      win.destroy();
+    }
+  });
+
   // Safe close for child windows: cleanup first, then destroy (no renderer teardown)
   ipcMain.on('window:closeChild', (event, terminalId?: string) => {
     const win = BrowserWindow.fromWebContents(event.sender);

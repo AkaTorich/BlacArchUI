@@ -11,6 +11,8 @@ export interface ElectronAPI {
   ptyWrite: (terminalId: string, data: string) => void;
   ptyResize: (terminalId: string, cols: number, rows: number) => void;
   ptyKill: (terminalId: string) => Promise<void>;
+  ptyGetBuffer: (terminalId: string) => Promise<string>;
+  sshGetBuffer: (terminalId: string) => Promise<string>;
   onPtyData: (callback: (terminalId: string, data: string) => void) => () => void;
   onPtyExit: (callback: (terminalId: string, exitCode: number) => void) => () => void;
 
@@ -75,6 +77,9 @@ export interface ElectronAPI {
   sftpRename: (connectionId: string, oldPath: string, newPath: string) => Promise<void>;
   sftpDownload: (connectionId: string, remotePath: string) => Promise<boolean>;
   sftpUpload: (connectionId: string, remoteDir: string) => Promise<string | null>;
+
+  dockTerminal: (opts: { terminalId: string; title: string; command?: string; sshConnectionId?: string }) => void;
+  onTerminalDocked: (callback: (opts: { terminalId: string; title: string; command?: string; sshConnectionId?: string }) => void) => () => void;
 
   windowMinimize: () => void;
   windowMaximize: () => void;

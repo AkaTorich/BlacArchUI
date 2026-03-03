@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useRef } from 'react';
 import { Plus, X, ExternalLink, Terminal as TerminalIcon } from 'lucide-react';
 import { TerminalPanel } from './TerminalPanel';
 
@@ -22,10 +22,21 @@ function createTab(opts?: { command?: string; sshConnectionId?: string; title?: 
   };
 }
 
+const MIN_HEIGHT = 100;
+const MAX_HEIGHT = 800;
+const DEFAULT_HEIGHT = 300;
+
 export function TerminalTabs() {
   const [tabs, setTabs] = useState<TabInfo[]>([]);
   const [activeTab, setActiveTab] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [panelHeight, setPanelHeight] = useState(DEFAULT_HEIGHT);
+  const [renamingTab, setRenamingTab] = useState<string | null>(null);
+  const [renameValue, setRenameValue] = useState('');
+  const isDragging = useRef(false);
+  const startY = useRef(0);
+  const startHeight = useRef(0);
+  const renameInputRef = useRef<HTMLInputElement>(null);
 
   const addTab = useCallback((commandOrOpts?: string | { command?: string; sshConnectionId?: string; title?: string }) => {
     let tab: TabInfo;
@@ -84,6 +95,56 @@ export function TerminalTabs() {
     }, 100);
   }, [tabs, activeTab]);
 
+  // ── Resize ──────────────────────────────────────────
+
+  const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    e.preventDefault();
+    isDragging.current = true;
+    startY.current = e.clientY;
+    startHeight.current = panelHeight;
+
+    const onMouseMove = (ev: MouseEvent) => {
+      if (!isDragging.current) return;
+      const delta = startY.current - ev.clientY;
+      const newHeight = Math.min(MAX_HEIGHT, Math.max(MIN_HEIGHT, startHeight.current + delta));
+      setPanelHeight(newHeight);
+    };
+
+    const onMouseUp = () => {
+      isDragging.current = false;
+      document.removeEventListener('mousemove', onMouseMove);
+      document.removeEventListener('mouseup', onMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+
+    document.body.style.cursor = 'ns-resize';
+    document.body.style.userSelect = 'none';
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+  }, [panelHeight]);
+
+  // ── Tab rename ──────────────────────────────────────
+
+  const handleTabContextMenu = useCallback((e: React.MouseEvent, tabId: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const tab = tabs.find((t) => t.id === tabId);
+    if (!tab) return;
+    setRenamingTab(tabId);
+    setRenameValue(tab.title);
+    setTimeout(() => renameInputRef.current?.select(), 0);
+  }, [tabs]);
+
+  const confirmRename = useCallback(() => {
+    if (renamingTab && renameValue.trim()) {
+      setTabs((prev) => prev.map((t) =>
+        t.id === renamingTab ? { ...t, title: renameValue.trim() } : t
+      ));
+    }
+    setRenamingTab(null);
+  }, [renamingTab, renameValue]);
+
   // Expose addTab globally
   React.useEffect(() => {
     (window as any).__addTerminalTab = addTab;
@@ -92,11 +153,37 @@ export function TerminalTabs() {
     };
   }, [addTab]);
 
+  // Listen for terminal docked back from external window
+  React.useEffect(() => {
+    const cleanup = window.electronAPI.onTerminalDocked((opts) => {
+      const tab: TabInfo = {
+        id: opts.terminalId,
+        title: opts.title,
+        command: opts.command,
+        sshConnectionId: opts.sshConnectionId,
+      };
+      setTabs((prev) => {
+        if (prev.some((t) => t.id === tab.id)) return prev;
+        return [...prev, tab];
+      });
+      setActiveTab(tab.id);
+      setIsExpanded(true);
+    });
+    return cleanup;
+  }, []);
+
   return (
     <div style={{
       ...styles.container,
-      height: isExpanded ? 300 : 36,
+      height: isExpanded ? panelHeight : 36,
     }}>
+      {/* Resize handle */}
+      {isExpanded && (
+        <div style={styles.resizeHandle} onMouseDown={handleMouseDown}>
+          <div style={styles.resizeGrip} />
+        </div>
+      )}
+
       <div style={styles.tabBar}>
         <div style={styles.tabBarLeft}>
           <TerminalIcon size={13} color="var(--accent-green)" />
@@ -118,8 +205,24 @@ export function TerminalTabs() {
                 setActiveTab(tab.id);
                 setIsExpanded(true);
               }}
+              onContextMenu={(e) => handleTabContextMenu(e, tab.id)}
             >
-              <span style={styles.tabTitle}>{tab.title}</span>
+              {renamingTab === tab.id ? (
+                <input
+                  ref={renameInputRef}
+                  style={styles.renameInput}
+                  value={renameValue}
+                  onChange={(e) => setRenameValue(e.target.value)}
+                  onBlur={confirmRename}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') confirmRename();
+                    if (e.key === 'Escape') setRenamingTab(null);
+                  }}
+                  onClick={(e) => e.stopPropagation()}
+                />
+              ) : (
+                <span style={styles.tabTitle}>{tab.title}</span>
+              )}
               <button
                 style={styles.popoutBtn}
                 onClick={(e) => popoutTab(tab.id, e)}
@@ -177,9 +280,24 @@ const styles: Record<string, React.CSSProperties> = {
     flexDirection: 'column',
     borderTop: '1px solid var(--border-color)',
     background: 'var(--bg-secondary)',
-    transition: 'height 0.2s ease',
     overflow: 'hidden',
     flexShrink: 0,
+  },
+  resizeHandle: {
+    height: 5,
+    cursor: 'ns-resize',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexShrink: 0,
+    background: 'transparent',
+  },
+  resizeGrip: {
+    width: 40,
+    height: 3,
+    borderRadius: 2,
+    background: 'rgba(255,255,255,0.12)',
+    transition: 'background 0.15s',
   },
   tabBar: {
     display: 'flex',
@@ -231,6 +349,17 @@ const styles: Record<string, React.CSSProperties> = {
     maxWidth: 100,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+  },
+  renameInput: {
+    width: 90,
+    background: 'rgba(255,255,255,0.06)',
+    border: '1px solid var(--accent-cyan)',
+    borderRadius: 3,
+    padding: '1px 4px',
+    color: 'var(--text-primary)',
+    fontSize: 'var(--font-size-xs)',
+    fontFamily: "'JetBrains Mono', monospace",
+    outline: 'none',
   },
   popoutBtn: {
     display: 'flex',

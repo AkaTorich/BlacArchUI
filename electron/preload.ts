@@ -16,6 +16,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.send('pty:resize', terminalId, cols, rows),
   ptyKill: (terminalId: string) =>
     ipcRenderer.invoke('pty:kill', terminalId),
+  ptyGetBuffer: (terminalId: string) =>
+    ipcRenderer.invoke('pty:getBuffer', terminalId),
+  sshGetBuffer: (terminalId: string) =>
+    ipcRenderer.invoke('ssh:getBuffer', terminalId),
   onPtyData: (callback: (terminalId: string, data: string) => void) => {
     const handler = (_event: any, terminalId: string, data: string) =>
       callback(terminalId, data);
@@ -125,6 +129,15 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.invoke('sftp:download', connectionId, remotePath),
   sftpUpload: (connectionId: string, remoteDir: string) =>
     ipcRenderer.invoke('sftp:upload', connectionId, remoteDir),
+
+  // Dock terminal back to main window
+  dockTerminal: (opts: { terminalId: string; title: string; command?: string; sshConnectionId?: string }) =>
+    ipcRenderer.send('terminal:dock', opts),
+  onTerminalDocked: (callback: (opts: { terminalId: string; title: string; command?: string; sshConnectionId?: string }) => void) => {
+    const handler = (_event: any, opts: any) => callback(opts);
+    ipcRenderer.on('terminal:docked', handler);
+    return () => ipcRenderer.removeListener('terminal:docked', handler);
+  },
 
   // Window controls
   windowMinimize: () => ipcRenderer.send('window:minimize'),

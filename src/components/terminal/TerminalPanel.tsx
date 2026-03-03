@@ -136,14 +136,18 @@ export function TerminalPanel({ terminalId, command, sshConnectionId, isActive, 
 
       if (sshConnectionId) {
         // SSH mode
-        terminal.write('\x1b[36mОткрытие SSH shell...\x1b[0m\r\n');
-
         window.electronAPI.sshOpenShell(sshConnectionId, terminalId)
-          .then(() => {
-            if (command) {
-              setTimeout(() => {
-                window.electronAPI.sshWriteToShell(sshConnectionId, terminalId, command + '\n');
-              }, 500);
+          .then(async (result: any) => {
+            if (result?.reused) {
+              // Replay saved output buffer
+              const buf = await window.electronAPI.sshGetBuffer(terminalId);
+              if (buf) terminal.write(buf);
+            } else {
+              if (command) {
+                setTimeout(() => {
+                  window.electronAPI.sshWriteToShell(sshConnectionId, terminalId, command + '\n');
+                }, 500);
+              }
             }
           })
           .catch((err: any) => {
@@ -159,7 +163,13 @@ export function TerminalPanel({ terminalId, command, sshConnectionId, isActive, 
         });
       } else {
         // Local mode
-        window.electronAPI.ptyCreate(terminalId, command);
+        window.electronAPI.ptyCreate(terminalId, command).then(async (result: any) => {
+          if (result?.reused) {
+            // Replay saved output buffer
+            const buf = await window.electronAPI.ptyGetBuffer(terminalId);
+            if (buf) terminal.write(buf);
+          }
+        });
 
         terminal.onData((data) => {
           window.electronAPI.ptyWrite(terminalId, data);
@@ -236,7 +246,8 @@ export function TerminalPanel({ terminalId, command, sshConnectionId, isActive, 
     <div
       style={{
         ...styles.container,
-        display: isActive ? 'block' : 'none',
+        visibility: isActive ? 'visible' : 'hidden',
+        zIndex: isActive ? 1 : 0,
       }}
       onClick={hideContextMenu}
     >
@@ -304,11 +315,13 @@ const ctxItemStyle: React.CSSProperties = {
 
 const styles: Record<string, React.CSSProperties> = {
   container: {
-    width: '100%',
-    height: '100%',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     padding: 4,
     background: '#0a0a0f',
-    position: 'relative',
   },
   terminalArea: {
     width: '100%',

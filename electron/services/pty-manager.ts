@@ -1,14 +1,11 @@
-import { exec } from 'node:child_process';
+import * as pty from '@lydell/node-pty';
 import { BrowserWindow } from 'electron';
-import * as os from 'node:os';
-import * as path from 'node:path';
+const MAX_SCROLLBACK = 100_000;
 
 interface PtySession {
   terminalId: string;
-  cwd: string;
-  inputBuffer: string;
-  running: boolean;
-  env: Record<string, string>;
+  process: pty.IPty;
+  outputBuffer: string;
 }
 
 export class PtyManager {
@@ -28,200 +25,118 @@ export class PtyManager {
     this.senders.delete(terminalId);
   }
 
-  private send(terminalId: string, data: string): void {
+  private sendToRenderer(terminalId: string, channel: string, ...args: any[]): void {
     const sender = this.senders.get(terminalId);
     if (sender && !sender.isDestroyed()) {
-      sender.send('pty:data', terminalId, data);
+      sender.send(channel, ...args);
     } else if (this.mainWindow && !this.mainWindow.isDestroyed()) {
-      this.mainWindow.webContents.send('pty:data', terminalId, data);
+      this.mainWindow.webContents.send(channel, ...args);
     }
   }
 
-  private getPrompt(session: PtySession): string {
+  getOutputBuffer(terminalId: string): string {
+    return this.sessions.get(terminalId)?.outputBuffer || '';
+  }
+
+  hasSession(terminalId: string): boolean {
+    return this.sessions.has(terminalId);
+  }
+
+  create(terminalId: string, command?: string): { pid: number; reused: boolean } {
+    // If session already exists (dock scenario), reuse it
+    const existing = this.sessions.get(terminalId);
+    if (existing) {
+      return { pid: existing.process.pid, reused: true };
+    }
+
     const isWin = process.platform === 'win32';
-    if (isWin) {
-      return `\x1b[32m${session.cwd}>\x1b[0m `;
-    }
-    const user = os.userInfo().username;
-    const hostname = os.hostname();
-    const home = os.homedir();
-    let displayCwd = session.cwd;
-    if (displayCwd.startsWith(home)) {
-      displayCwd = '~' + displayCwd.slice(home.length);
-    }
-    return `\x1b[32m${user}@${hostname}\x1b[0m:\x1b[34m${displayCwd}\x1b[0m$ `;
-  }
+    const shell = isWin
+      ? (process.env.COMSPEC || 'cmd.exe')
+      : (process.env.SHELL || '/bin/bash');
 
-  create(terminalId: string, command?: string): { pid: number } {
     const cwd = process.env.HOME || process.env.USERPROFILE || '/';
+
+    const args: string[] = [];
+    // If a command was provided, run it in the shell
+    if (command) {
+      if (isWin) {
+        args.push('/c', command);
+      } else {
+        args.push('-c', command);
+      }
+    }
+
+    const ptyProcess = pty.spawn(shell, args, {
+      name: 'xterm-256color',
+      cols: 80,
+      rows: 30,
+      cwd,
+      env: process.env as { [key: string]: string },
+    });
 
     const session: PtySession = {
       terminalId,
-      cwd,
-      inputBuffer: '',
-      running: false,
-      env: { ...process.env } as Record<string, string>,
+      process: ptyProcess,
+      outputBuffer: '',
     };
 
     this.sessions.set(terminalId, session);
 
-    // Show welcome banner and prompt
-    const isWin = process.platform === 'win32';
-    const shellName = isWin ? 'BlacArchUI Terminal (cmd)' : 'BlacArchUI Terminal (bash)';
-    this.send(terminalId, `\x1b[36m${shellName}\x1b[0m\r\n`);
-    this.send(terminalId, this.getPrompt(session));
+    ptyProcess.onData((data: string) => {
+      // Append to ring buffer
+      session.outputBuffer += data;
+      if (session.outputBuffer.length > MAX_SCROLLBACK) {
+        session.outputBuffer = session.outputBuffer.slice(-MAX_SCROLLBACK);
+      }
+      this.sendToRenderer(terminalId, 'pty:data', terminalId, data);
+    });
 
-    // If a command was provided, execute it
-    if (command) {
-      setTimeout(() => {
-        session.inputBuffer = command;
-        this.send(terminalId, command);
-        this.executeCommand(session);
-      }, 100);
-    }
+    ptyProcess.onExit(({ exitCode }) => {
+      this.sendToRenderer(terminalId, 'pty:exit', terminalId, exitCode);
+      this.sessions.delete(terminalId);
+      this.senders.delete(terminalId);
+    });
 
-    return { pid: process.pid };
+    return { pid: ptyProcess.pid, reused: false };
   }
 
   write(terminalId: string, data: string): void {
     const session = this.sessions.get(terminalId);
-    if (!session || session.running) return;
-
-    for (const char of data) {
-      const code = char.charCodeAt(0);
-
-      if (char === '\r' || char === '\n') {
-        // Enter pressed — execute command
-        this.send(terminalId, '\r\n');
-        this.executeCommand(session);
-      } else if (code === 127 || code === 8) {
-        // Backspace
-        if (session.inputBuffer.length > 0) {
-          session.inputBuffer = session.inputBuffer.slice(0, -1);
-          this.send(terminalId, '\b \b');
-        }
-      } else if (code === 3) {
-        // Ctrl+C
-        session.inputBuffer = '';
-        this.send(terminalId, '^C\r\n');
-        this.send(terminalId, this.getPrompt(session));
-      } else if (code === 12) {
-        // Ctrl+L — clear screen
-        session.inputBuffer = '';
-        this.send(terminalId, '\x1b[2J\x1b[H');
-        this.send(terminalId, this.getPrompt(session));
-      } else if (code >= 32) {
-        // Printable character
-        session.inputBuffer += char;
-        this.send(terminalId, char);
-      }
-    }
+    if (!session) return;
+    session.process.write(data);
   }
 
-  private executeCommand(session: PtySession): void {
-    const cmd = session.inputBuffer.trim();
-    session.inputBuffer = '';
-
-    if (!cmd) {
-      this.send(session.terminalId, this.getPrompt(session));
-      return;
+  resize(terminalId: string, cols: number, rows: number): void {
+    const session = this.sessions.get(terminalId);
+    if (!session) return;
+    try {
+      session.process.resize(cols, rows);
+    } catch {
+      // Process may have already exited
     }
-
-    // Handle built-in cd command
-    const cdMatch = cmd.match(/^cd\s+(.*)/);
-    if (cdMatch || cmd === 'cd') {
-      const target = cdMatch ? cdMatch[1].replace(/^["']|["']$/g, '').trim() : (os.homedir());
-      let newPath: string;
-
-      if (path.isAbsolute(target)) {
-        newPath = target;
-      } else if (target === '~') {
-        newPath = os.homedir();
-      } else if (target.startsWith('~' + path.sep) || target.startsWith('~/')) {
-        newPath = path.join(os.homedir(), target.slice(2));
-      } else {
-        newPath = path.resolve(session.cwd, target);
-      }
-
-      try {
-        const fs = require('node:fs');
-        if (fs.existsSync(newPath) && fs.statSync(newPath).isDirectory()) {
-          session.cwd = newPath;
-        } else {
-          this.send(session.terminalId, `\x1b[31mcd: нет такого каталога: ${target}\x1b[0m\r\n`);
-        }
-      } catch {
-        this.send(session.terminalId, `\x1b[31mcd: ошибка: ${target}\x1b[0m\r\n`);
-      }
-      this.send(session.terminalId, this.getPrompt(session));
-      return;
-    }
-
-    // Handle clear/cls
-    if (cmd === 'clear' || cmd === 'cls') {
-      this.send(session.terminalId, '\x1b[2J\x1b[H');
-      this.send(session.terminalId, this.getPrompt(session));
-      return;
-    }
-
-    // Handle exit
-    if (cmd === 'exit') {
-      this.send(session.terminalId, '\r\n\x1b[90m[Сессия завершена]\x1b[0m\r\n');
-      const sender = this.senders.get(session.terminalId);
-      if (sender && !sender.isDestroyed()) {
-        sender.send('pty:exit', session.terminalId, 0);
-      } else if (this.mainWindow && !this.mainWindow.isDestroyed()) {
-        this.mainWindow.webContents.send('pty:exit', session.terminalId, 0);
-      }
-      this.sessions.delete(session.terminalId);
-      this.senders.delete(session.terminalId);
-      return;
-    }
-
-    // Execute external command
-    session.running = true;
-    const isWin = process.platform === 'win32';
-    exec(cmd, {
-      cwd: session.cwd,
-      env: session.env,
-      shell: isWin ? 'cmd.exe' : '/bin/bash',
-      maxBuffer: 10 * 1024 * 1024,
-      timeout: 30000,
-    }, (error, stdout, stderr) => {
-      if (stdout) {
-        // Convert \n to \r\n for xterm
-        const output = stdout.replace(/\r?\n/g, '\r\n');
-        this.send(session.terminalId, output);
-        if (!output.endsWith('\r\n')) {
-          this.send(session.terminalId, '\r\n');
-        }
-      }
-      if (stderr) {
-        const errOutput = stderr.replace(/\r?\n/g, '\r\n');
-        this.send(session.terminalId, `\x1b[31m${errOutput}\x1b[0m`);
-        if (!errOutput.endsWith('\r\n')) {
-          this.send(session.terminalId, '\r\n');
-        }
-      }
-      if (error && !stdout && !stderr) {
-        const msg = error.message.replace(/\r?\n/g, '\r\n');
-        this.send(session.terminalId, `\x1b[31m${msg}\x1b[0m\r\n`);
-      }
-      session.running = false;
-      this.send(session.terminalId, this.getPrompt(session));
-    });
-  }
-
-  resize(_terminalId: string, _cols: number, _rows: number): void {
-    // No resize support in this mode
   }
 
   kill(terminalId: string): void {
-    this.sessions.delete(terminalId);
-    this.senders.delete(terminalId);
+    const session = this.sessions.get(terminalId);
+    if (session) {
+      try {
+        session.process.kill();
+      } catch {
+        // Already dead
+      }
+      this.sessions.delete(terminalId);
+      this.senders.delete(terminalId);
+    }
   }
 
   killAll(): void {
+    for (const session of this.sessions.values()) {
+      try {
+        session.process.kill();
+      } catch {
+        // ignore
+      }
+    }
     this.sessions.clear();
     this.senders.clear();
   }
